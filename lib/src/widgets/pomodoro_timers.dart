@@ -42,9 +42,10 @@ class _PomodoroTimersState extends State<PomodoroTimers> {
   int _currentInterval = 1;
 
   // current timer
-  _TimerStep _currentTimer = _TimerStep.pomodoro;
+  _TimerStep _currentTimerStep = _TimerStep.pomodoro;
 
-  List<bool> get _isSelected => _timers.map((e) => e == _currentTimer).toList();
+  List<bool> get _isSelected =>
+      _timers.map((e) => e == _currentTimerStep).toList();
 
   Widget _buildToggle(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -55,7 +56,7 @@ class _PomodoroTimersState extends State<PomodoroTimers> {
       constraints: const BoxConstraints(minHeight: 36.0),
       onPressed: (index) {
         setState(() {
-          _currentTimer = _timers[index];
+          _currentTimerStep = _timers[index];
         });
       },
       children: [
@@ -81,24 +82,22 @@ class _PomodoroTimersState extends State<PomodoroTimers> {
 
   void _pomodoroTimerNext() {
     setState(() {
-      _currentTimer = _TimerStep.shortBreak;
+      _currentTimerStep = _TimerStep.shortBreak;
     });
   }
 
   void _shortBreakTimerNext() {
     setState(() {
       _currentInterval++;
-      if (_currentInterval == widget.longBreakInterval) {
-        _currentTimer = _TimerStep.longBreak;
-      } else {
-        _currentTimer = _TimerStep.pomodoro;
-      }
+      _currentTimerStep = _currentInterval == widget.longBreakInterval
+          ? _TimerStep.longBreak
+          : _TimerStep.pomodoro;
     });
   }
 
   void _longBreakTimerNext() {
     setState(() {
-      _currentTimer = _TimerStep.pomodoro;
+      _currentTimerStep = _TimerStep.pomodoro;
       _currentInterval = 1;
     });
   }
@@ -149,7 +148,7 @@ class _PomodoroTimersState extends State<PomodoroTimers> {
   }
 
   Widget _buildContent(BuildContext context) {
-    switch (_currentTimer) {
+    switch (_currentTimerStep) {
       case _TimerStep.pomodoro:
         return _buildPomodoroTimer(context);
       case _TimerStep.shortBreak:
