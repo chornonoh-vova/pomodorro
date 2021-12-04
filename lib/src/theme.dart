@@ -4,17 +4,27 @@ import 'utils/colors.dart';
 
 class PomodorroTheme {
   static const Color _primaryColor = Color(0xFFCA3C32);
-  static const Color _accentColor = Color(0xFF3F6C33);
+  static const Color _secondaryColor = Color(0xFF3F6C33);
 
-  static final ColorScheme _lightColorScheme = ColorScheme.fromSwatch(
-    primarySwatch: generateMaterialColor(_primaryColor),
-    accentColor: _accentColor,
+  static final ColorScheme _lightColorScheme = ColorScheme(
+    primary: const Color(0xFFCA3C32),
+    primaryVariant: const Color(0xFF92000b),
+    secondary: const Color(0xFF3F6C33),
+    secondaryVariant: const Color(0xFF12410a),
+    background: const Color(0xFFEA9D9A),
+    error: Colors.yellow[700]!,
+    surface: const Color(0xffffffff),
+    onPrimary: const Color(0xffffffff),
+    onSecondary: const Color(0xffffffff),
+    onBackground: const Color(0xff000000),
+    onSurface: const Color(0xff000000),
+    onError: const Color(0xff000000),
     brightness: Brightness.light,
   );
 
   static final ColorScheme _darkColorScheme = ColorScheme.fromSwatch(
     primarySwatch: generateMaterialColor(_primaryColor),
-    accentColor: _accentColor,
+    accentColor: _secondaryColor,
     brightness: Brightness.dark,
   );
 

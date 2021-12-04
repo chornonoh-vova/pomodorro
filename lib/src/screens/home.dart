@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:pomodorro/src/constants.dart';
 
-import 'package:pomodorro/src/widgets/pomodoro_timers.dart';
+import 'package:pomodorro/src/widgets/pomodoro_timer_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -35,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          PomodoroTimers(
+          PomodoroTimerCard(
             pomodoroLength: _pomodoroLength,
             shortBreakLength: _shortBreakLength,
             longBreakLength: _longBreakLength,
