@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+import 'package:pomodorro/src/constants.dart';
+
+import 'package:pomodorro/src/widgets/pomodoro_timer_card.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  // settings
+  int _pomodoroLength = defaultPomodoroLength;
+  int _shortBreakLength = defaultShortBreakLength;
+  int _longBreakLength = defaultLongBreakLength;
+
+  bool _autoStartPomodoros = defaultAutoStartPomodoros;
+  bool _autoStartBreaks = defaultAutoStartBreaks;
+
+  int _longBreakInterval = defaultLongBreakInterval;
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -17,11 +34,17 @@ class HomeScreen extends StatelessWidget {
         ],
         title: const Text('Pomodorro'),
       ),
-      body: Center(
-        child: Text(
-          'Home screen',
-          style: textTheme.bodyText1,
-        ),
+      body: Column(
+        children: [
+          PomodoroTimerCard(
+            pomodoroLength: _pomodoroLength,
+            shortBreakLength: _shortBreakLength,
+            longBreakLength: _longBreakLength,
+            autoStartPomodoros: _autoStartPomodoros,
+            autoStartBreaks: _autoStartBreaks,
+            longBreakInterval: _longBreakInterval,
+          ),
+        ],
       ),
     );
   }

@@ -38,3 +38,5 @@ flutter:
 
 flutter_native_splash:
   color: "#d95550"
+  color_dark: "#424242"
+  image: assets/tomato.png
