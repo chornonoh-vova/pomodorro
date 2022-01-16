@@ -51,6 +51,5 @@ class TimerToggle extends StatelessWidget {
         ),
       ],
     );
-    ;
   }
 }

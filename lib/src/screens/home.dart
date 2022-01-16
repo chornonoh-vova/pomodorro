@@ -13,14 +13,14 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // settings
-  int _pomodoroLength = defaultPomodoroLength;
-  int _shortBreakLength = defaultShortBreakLength;
-  int _longBreakLength = defaultLongBreakLength;
+  final int _pomodoroLength = defaultPomodoroLength;
+  final int _shortBreakLength = defaultShortBreakLength;
+  final int _longBreakLength = defaultLongBreakLength;
 
-  bool _autoStartPomodoros = defaultAutoStartPomodoros;
-  bool _autoStartBreaks = defaultAutoStartBreaks;
+  final bool _autoStartPomodoros = defaultAutoStartPomodoros;
+  final bool _autoStartBreaks = defaultAutoStartBreaks;
 
-  int _longBreakInterval = defaultLongBreakInterval;
+  final int _longBreakInterval = defaultLongBreakInterval;
 
   @override
   Widget build(BuildContext context) {

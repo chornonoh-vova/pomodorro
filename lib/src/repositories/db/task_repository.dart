@@ -1,45 +1,21 @@
 import 'package:sqflite/sqflite.dart';
 
 import 'package:pomodorro/src/models/task.dart';
+import 'package:pomodorro/src/repositories/task_repository.dart';
 
 import 'tables.dart';
 import 'helper.dart';
-import '../task_repository.dart';
+import 'dtos/task_dto.dart';
 
 class DbTaskRepository implements TaskRepository {
-  late final DbHelper _dbProvider;
+  late final DbHelper _dbHelper;
   final TasksTable _table = DbHelper.tables['tasks'] as TasksTable;
 
   DbTaskRepository({
     required String path,
     required DatabaseFactory factory,
   }) {
-    _dbProvider = DbHelper(path: path, factory: factory);
-  }
-
-  Future<Database> get _database async {
-    return _dbProvider.database;
-  }
-
-  Task _taskFromMap(Map<String, dynamic> element) {
-    return Task(
-      id: element[_table.id.name],
-      title: element[_table.title.name],
-      description: element[_table.description.name],
-      done: element[_table.done.name] == 1,
-    );
-  }
-
-  Map<String, dynamic> _mapFromValues({
-    required String title,
-    required String description,
-    required bool done,
-  }) {
-    return {
-      _table.title.name: title,
-      _table.description.name: description,
-      _table.done.name: done ? 1 : 0,
-    };
+    _dbHelper = DbHelper(path: path, factory: factory);
   }
 
   @override
@@ -48,15 +24,15 @@ class DbTaskRepository implements TaskRepository {
     required String description,
     required bool done,
   }) async {
-    final db = await _database;
+    final db = await _dbHelper.database;
 
     final id = await db.insert(
       _table.name,
-      _mapFromValues(
+      TaskDto.fromValues(
         title: title,
         description: description,
         done: done,
-      ),
+      ).toMap(),
     );
 
     return Task(
@@ -69,7 +45,7 @@ class DbTaskRepository implements TaskRepository {
 
   @override
   Future<int> delete(int id) async {
-    final db = await _database;
+    final db = await _dbHelper.database;
 
     return db.delete(
       _table.name,
@@ -80,15 +56,15 @@ class DbTaskRepository implements TaskRepository {
 
   @override
   Future<List<Task>> getAll() async {
-    final db = await _database;
+    final db = await _dbHelper.database;
     final rows = await db.query(_table.name);
 
-    return rows.map(_taskFromMap).toList();
+    return rows.map((e) => TaskDto.fromMap(e).toTask()).toList();
   }
 
   @override
-  Future<Task> getOne(int id) async {
-    final db = await _database;
+  Future<Task?> getOne(int id) async {
+    final db = await _dbHelper.database;
     final rows = await db.query(
       _table.name,
       where: '${_table.id.name} = ?',
@@ -96,19 +72,23 @@ class DbTaskRepository implements TaskRepository {
       limit: 1,
     );
 
-    return rows.map(_taskFromMap).toList().first;
+    if (rows.isNotEmpty) {
+      return TaskDto.fromMap(rows.first).toTask();
+    }
+
+    return null;
   }
 
   @override
   Future<List<Task>> search(String query) async {
-    final db = await _database;
+    final db = await _dbHelper.database;
     final rows = await db.query(
       _table.name,
       where: '${_table.title.name} LIKE ?',
       whereArgs: ['%$query%'],
     );
 
-    return rows.map(_taskFromMap).toList();
+    return rows.map((e) => TaskDto.fromMap(e).toTask()).toList();
   }
 
   @override
@@ -118,30 +98,30 @@ class DbTaskRepository implements TaskRepository {
     String? description,
     bool? done,
   }) async {
-    final db = await _database;
+    final db = await _dbHelper.database;
 
     final original = await getOne(id);
 
+    if (original == null) return null;
+
     final updated = await db.update(
       _table.name,
-      _mapFromValues(
+      TaskDto.fromValues(
         title: title ?? original.title,
         description: description ?? original.description,
         done: done ?? original.done,
-      ),
+      ).toMap(),
       where: '${_table.id.name} = ?',
       whereArgs: [id],
     );
 
-    if (updated == 1) {
-      return Task(
-        id: id,
-        title: title ?? original.title,
-        description: description ?? original.description,
-        done: done ?? original.done,
-      );
-    }
+    if (updated == 0) return null;
 
-    return null;
+    return Task(
+      id: id,
+      title: title ?? original.title,
+      description: description ?? original.description,
+      done: done ?? original.done,
+    );
   }
 }

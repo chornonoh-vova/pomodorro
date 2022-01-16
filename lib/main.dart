@@ -6,6 +6,9 @@ import 'package:sqflite/sqflite.dart';
 import 'src/repositories/task_repository.dart';
 import 'src/repositories/db/task_repository.dart';
 
+import 'src/repositories/pomo_repository.dart';
+import 'src/repositories/db/pomo_repository.dart';
+
 import 'src/app.dart';
 
 void main() async {
@@ -15,6 +18,13 @@ void main() async {
 
   GetIt.I.registerSingleton<TaskRepository>(
     DbTaskRepository(
+      path: path,
+      factory: databaseFactory,
+    ),
+  );
+
+  GetIt.I.registerSingleton<PomoRepository>(
+    DbPomoRepository(
       path: path,
       factory: databaseFactory,
     ),

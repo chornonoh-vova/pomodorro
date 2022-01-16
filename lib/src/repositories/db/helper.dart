@@ -46,12 +46,14 @@ class DbHelper {
   }
 
   Future<void> _onCreateDb(Database db, int version) async {
-    for (final table in tables.values) {
-      if (table.fromVersion <= version) {
-        await db.execute(table.dropIfNotExists());
-        await db.execute(table.createTableInitial());
+    await db.transaction((txn) async {
+      for (final table in tables.values) {
+        if (table.fromVersion <= version) {
+          await txn.execute(table.dropIfNotExists());
+          await txn.execute(table.createTableInitial());
+        }
       }
-    }
+    });
   }
 
   Future<void> _onUpgradeDb(
@@ -59,14 +61,16 @@ class DbHelper {
     int oldVersion,
     int newVersion,
   ) async {
-    for (final table in tables.values) {
-      final migrations = table.migrateUp(oldVersion, newVersion);
-      if (migrations.isNotEmpty) {
-        for (final migration in migrations) {
-          await db.execute(migration);
+    await db.transaction((txn) async {
+      for (final table in tables.values) {
+        final migrations = table.migrateUp(oldVersion, newVersion);
+        if (migrations.isNotEmpty) {
+          for (final migration in migrations) {
+            await txn.execute(migration);
+          }
         }
       }
-    }
+    });
   }
 
   Future<void> _onDowngradeDb(
@@ -74,13 +78,15 @@ class DbHelper {
     int oldVersion,
     int newVersion,
   ) async {
-    for (final table in tables.values) {
-      final migrations = table.migrateDown(oldVersion, newVersion);
-      if (migrations.isNotEmpty) {
-        for (final migration in migrations) {
-          await db.execute(migration);
+    await db.transaction((txn) async {
+      for (final table in tables.values) {
+        final migrations = table.migrateDown(oldVersion, newVersion);
+        if (migrations.isNotEmpty) {
+          for (final migration in migrations) {
+            await db.execute(migration);
+          }
         }
       }
-    }
+    });
   }
 }

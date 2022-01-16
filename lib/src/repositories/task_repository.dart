@@ -10,7 +10,7 @@ abstract class TaskRepository {
   });
 
   /// Get one item from underlying data source
-  Future<Task> getOne(int id);
+  Future<Task?> getOne(int id);
 
   /// Get all items from underlying data source
   Future<List<Task>> getAll();
