@@ -4,9 +4,9 @@ import 'package:pomodorro/src/models/task.dart';
 import 'package:pomodorro/src/models/pomo.dart';
 import 'package:pomodorro/src/repositories/pomo_repository.dart';
 
-import 'dtos/pomo_dto.dart';
-import 'helper.dart';
-import 'tables.dart';
+import '../dtos/pomo_dto.dart';
+import '../helper.dart';
+import '../tables.dart';
 
 class DbPomoRepository implements PomoRepository {
   late final DbHelper _dbHelper;

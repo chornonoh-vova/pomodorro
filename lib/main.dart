@@ -4,10 +4,10 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'src/repositories/task_repository.dart';
-import 'src/repositories/db/task_repository.dart';
+import 'src/database/repositories/task_repository.dart';
 
 import 'src/repositories/pomo_repository.dart';
-import 'src/repositories/db/pomo_repository.dart';
+import 'src/database/repositories/pomo_repository.dart';
 
 import 'src/app.dart';
 

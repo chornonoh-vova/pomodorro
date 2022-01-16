@@ -3,9 +3,9 @@ import 'package:sqflite/sqflite.dart';
 import 'package:pomodorro/src/models/task.dart';
 import 'package:pomodorro/src/repositories/task_repository.dart';
 
-import 'tables.dart';
-import 'helper.dart';
-import 'dtos/task_dto.dart';
+import '../tables.dart';
+import '../helper.dart';
+import '../dtos/task_dto.dart';
 
 class DbTaskRepository implements TaskRepository {
   late final DbHelper _dbHelper;
