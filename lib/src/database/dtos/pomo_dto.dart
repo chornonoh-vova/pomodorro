@@ -23,22 +23,23 @@ class PomoDto {
 
   PomoDto.fromMap(Map<String, dynamic> map) {
     _id = map[_pomos.id.name];
-    _time = DateTime.fromMillisecondsSinceEpoch(
+    _time = DateTime.fromMicrosecondsSinceEpoch(
       map[_pomos.time.name],
       isUtc: true,
     );
-    _task = map[_pomos.taskId.name] ??
-        Task(
-          id: map[_pomos.taskId.name],
-          title: map[_tasks.title.name],
-          description: map[_tasks.description.name],
-          done: map[_tasks.done.name] == 1,
-        );
+    _task = map[_pomos.taskId.name] != null
+        ? Task(
+            id: map[_pomos.taskId.name],
+            title: map[_tasks.title.name],
+            description: map[_tasks.description.name],
+            done: map[_tasks.done.name] == 1,
+          )
+        : null;
   }
 
   Map<String, dynamic> toMap() {
     var map = {
-      _pomos.time.name: _time?.millisecondsSinceEpoch,
+      _pomos.time.name: _time?.microsecondsSinceEpoch,
       _pomos.taskId.name: _task?.id,
     };
 
@@ -52,7 +53,7 @@ class PomoDto {
   Pomo toPomo() {
     return Pomo(
       id: _id ?? 0,
-      time: _time ?? DateTime.fromMillisecondsSinceEpoch(0, isUtc: true),
+      time: _time ?? DateTime.fromMicrosecondsSinceEpoch(0, isUtc: true),
       task: _task,
     );
   }

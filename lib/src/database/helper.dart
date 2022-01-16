@@ -2,8 +2,6 @@ import 'package:sqflite/sqflite.dart';
 
 import 'tables.dart';
 
-const int _version = 1;
-
 class DbHelper {
   static const tables = {
     'tasks': TasksTable(),
@@ -31,7 +29,7 @@ class DbHelper {
     _db = await factory.openDatabase(
       path,
       options: OpenDatabaseOptions(
-        version: _version,
+        version: version,
         onConfigure: _onConfigureDb,
         onCreate: _onCreateDb,
         onUpgrade: _onUpgradeDb,

@@ -28,4 +28,7 @@ abstract class PomoRepository {
   ///
   /// Returns number of removed items
   Future<int> delete(int id);
+
+  /// Delete all items
+  Future<int> deleteAll();
 }

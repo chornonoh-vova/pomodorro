@@ -51,20 +51,20 @@ class DbPomoRepository implements PomoRepository {
   }
 
   String _buildRawQuery({String? where, int? limit}) {
-    return '''
-      SELECT
-        ${_pomos.name}.${_pomos.id.name},
-        ${_pomos.name}.${_pomos.time.name},
-        ${_pomos.name}.${_pomos.taskId.name},
-        ${_tasks.name}.${_tasks.title.name},
-        ${_tasks.name}.${_tasks.description.name},
-        ${_tasks.name}.${_tasks.done.name}
+    return '''SELECT
+        ${_pomos.name}.${_pomos.id.name} as ${_pomos.id.name},
+        ${_pomos.name}.${_pomos.time.name} as ${_pomos.time.name},
+        ${_pomos.name}.${_pomos.taskId.name} as ${_pomos.taskId.name},
+        ${_tasks.name}.${_tasks.title.name} as ${_tasks.title.name},
+        ${_tasks.name}.${_tasks.description.name} as ${_tasks.description.name},
+        ${_tasks.name}.${_tasks.done.name} as ${_tasks.done.name}
       FROM ${_pomos.name}
-      INNER JOIN ${_tasks.name}
+      LEFT JOIN ${_tasks.name}
       ON ${_pomos.name}.${_pomos.taskId.name} = ${_tasks.name}.${_tasks.id.name}
       ${where != null ? 'WHERE $where' : ''}
       ${limit != null ? 'LIMIT $limit' : ''}
-    ''';
+      '''
+        .trim();
   }
 
   @override
@@ -79,7 +79,7 @@ class DbPomoRepository implements PomoRepository {
   Future<Pomo?> getOne(int id) async {
     final db = await _dbHelper.database;
     final rows = await db.rawQuery(
-      _buildRawQuery(where: '${_pomos.id.name} = ?', limit: 1),
+      _buildRawQuery(where: '${_pomos.name}.${_pomos.id.name} = ?', limit: 1),
       [id],
     );
 
@@ -115,5 +115,12 @@ class DbPomoRepository implements PomoRepository {
       time: time ?? original.time,
       task: task ?? original.task,
     );
+  }
+
+  @override
+  Future<int> deleteAll() async {
+    final db = await _dbHelper.database;
+
+    return db.delete(_pomos.name);
   }
 }

@@ -32,4 +32,7 @@ abstract class TaskRepository {
   ///
   /// Returns number of removed items
   Future<int> delete(int id);
+
+  /// Delete all items
+  Future<int> deleteAll();
 }

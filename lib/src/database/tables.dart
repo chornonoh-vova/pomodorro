@@ -1,3 +1,5 @@
+const int version = 1;
+
 class Column {
   final String name;
   final String definition;
@@ -60,7 +62,8 @@ class TasksTable extends Table {
         ${description.name} ${description.definition},
         ${done.name} ${done.definition}
       )
-    ''';
+      '''
+        .trim();
   }
 }
 
@@ -85,6 +88,7 @@ class PomosTable extends Table {
         ${taskId.name} ${taskId.definition},
         FOREIGN KEY(${taskId.name}) REFERENCES tasks(id)
       )
-    ''';
+      '''
+        .trim();
   }
 }

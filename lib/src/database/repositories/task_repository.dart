@@ -9,7 +9,7 @@ import '../dtos/task_dto.dart';
 
 class DbTaskRepository implements TaskRepository {
   late final DbHelper _dbHelper;
-  final TasksTable _table = DbHelper.tables['tasks'] as TasksTable;
+  final TasksTable _tasks = DbHelper.tables['tasks'] as TasksTable;
 
   DbTaskRepository({
     required String path,
@@ -27,7 +27,7 @@ class DbTaskRepository implements TaskRepository {
     final db = await _dbHelper.database;
 
     final id = await db.insert(
-      _table.name,
+      _tasks.name,
       TaskDto.fromValues(
         title: title,
         description: description,
@@ -48,8 +48,8 @@ class DbTaskRepository implements TaskRepository {
     final db = await _dbHelper.database;
 
     return db.delete(
-      _table.name,
-      where: '${_table.id.name} = ?',
+      _tasks.name,
+      where: '${_tasks.id.name} = ?',
       whereArgs: [id],
     );
   }
@@ -57,7 +57,7 @@ class DbTaskRepository implements TaskRepository {
   @override
   Future<List<Task>> getAll() async {
     final db = await _dbHelper.database;
-    final rows = await db.query(_table.name);
+    final rows = await db.query(_tasks.name);
 
     return rows.map((e) => TaskDto.fromMap(e).toTask()).toList();
   }
@@ -66,8 +66,8 @@ class DbTaskRepository implements TaskRepository {
   Future<Task?> getOne(int id) async {
     final db = await _dbHelper.database;
     final rows = await db.query(
-      _table.name,
-      where: '${_table.id.name} = ?',
+      _tasks.name,
+      where: '${_tasks.id.name} = ?',
       whereArgs: [id],
       limit: 1,
     );
@@ -83,8 +83,8 @@ class DbTaskRepository implements TaskRepository {
   Future<List<Task>> search(String query) async {
     final db = await _dbHelper.database;
     final rows = await db.query(
-      _table.name,
-      where: '${_table.title.name} LIKE ?',
+      _tasks.name,
+      where: '${_tasks.title.name} LIKE ?',
       whereArgs: ['%$query%'],
     );
 
@@ -105,13 +105,13 @@ class DbTaskRepository implements TaskRepository {
     if (original == null) return null;
 
     final updated = await db.update(
-      _table.name,
+      _tasks.name,
       TaskDto.fromValues(
         title: title ?? original.title,
         description: description ?? original.description,
         done: done ?? original.done,
       ).toMap(),
-      where: '${_table.id.name} = ?',
+      where: '${_tasks.id.name} = ?',
       whereArgs: [id],
     );
 
@@ -123,5 +123,12 @@ class DbTaskRepository implements TaskRepository {
       description: description ?? original.description,
       done: done ?? original.done,
     );
+  }
+
+  @override
+  Future<int> deleteAll() async {
+    final db = await _dbHelper.database;
+
+    return db.delete(_tasks.name);
   }
 }
