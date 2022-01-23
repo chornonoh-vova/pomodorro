@@ -9,6 +9,9 @@ import 'src/database/repositories/task_repository.dart';
 import 'src/repositories/pomo_repository.dart';
 import 'src/database/repositories/pomo_repository.dart';
 
+import 'package:pomodorro/src/preferences/settings_repository.dart';
+import 'package:pomodorro/src/repositories/settings_repository.dart';
+
 import 'src/app.dart';
 
 void main() async {
@@ -28,6 +31,10 @@ void main() async {
       path: path,
       factory: databaseFactory,
     ),
+  );
+
+  GetIt.I.registerSingleton<SettingsRepository>(
+    PreferencesSettingsRepository(),
   );
 
   runApp(const PomodorroApp());

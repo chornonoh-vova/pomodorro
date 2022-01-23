@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 import 'package:pomodorro/src/constants.dart';
+import 'package:pomodorro/src/repositories/settings_repository.dart';
 
 import 'package:pomodorro/src/widgets/pomodoro_timer_card.dart';
 
@@ -13,14 +15,44 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // settings
-  final int _pomodoroLength = defaultPomodoroLength;
-  final int _shortBreakLength = defaultShortBreakLength;
-  final int _longBreakLength = defaultLongBreakLength;
+  int _pomodoroLength = defaultPomodoroLength;
+  int _shortBreakLength = defaultShortBreakLength;
+  int _longBreakLength = defaultLongBreakLength;
 
-  final bool _autoStartPomodoros = defaultAutoStartPomodoros;
-  final bool _autoStartBreaks = defaultAutoStartBreaks;
+  bool _autoStartPomodoros = defaultAutoStartPomodoros;
+  bool _autoStartBreaks = defaultAutoStartBreaks;
 
-  final int _longBreakInterval = defaultLongBreakInterval;
+  int _longBreakInterval = defaultLongBreakInterval;
+
+  Future<void> _loadSettings() async {
+    final settings = GetIt.I.get<SettingsRepository>();
+
+    Future.wait([
+      settings.getPomodoroLength(),
+      settings.getShortBreakLength(),
+      settings.getLongBreakLength(),
+      settings.getAutoStartPomodoros(),
+      settings.getAutoStartBreaks(),
+      settings.getLongBreakInterval(),
+    ]).then((values) {
+      setState(() {
+        _pomodoroLength = values[0] as int;
+        _shortBreakLength = values[1] as int;
+        _longBreakLength = values[2] as int;
+
+        _autoStartPomodoros = values[3] as bool;
+        _autoStartBreaks = values[4] as bool;
+
+        _longBreakInterval = values[5] as int;
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    _loadSettings();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
