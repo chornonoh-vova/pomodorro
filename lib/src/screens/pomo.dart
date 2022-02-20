@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+class PomoScreen extends StatefulWidget {
+  const PomoScreen({Key? key}) : super(key: key);
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  State<PomoScreen> createState() => _PomoScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _PomoScreenState extends State<PomoScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Settings')),
+      appBar: AppBar(title: Text('Pomo')),
       body: SafeArea(
         child: Center(
           child: Text(
-            'Settings screen',
+            'Pomo screen',
             style: textTheme.bodyText1,
           ),
         ),

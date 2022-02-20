@@ -39,7 +39,8 @@ void main() {
 
     test('Should add one pomo without task', () async {
       final pomo = await pomos.create(
-        time: DateTime.now().toUtc(),
+        startTime: DateTime.now().toUtc(),
+        endTime: DateTime.now().toUtc(),
       );
 
       expect(await pomos.getOne(pomo.id), pomo);
@@ -53,7 +54,8 @@ void main() {
       );
 
       final pomo = await pomos.create(
-        time: DateTime.now().toUtc(),
+        startTime: DateTime.now().toUtc(),
+        endTime: DateTime.now().toUtc(),
         task: task,
       );
 
@@ -63,15 +65,18 @@ void main() {
 
     test('Should add list of pomos without tasks', () async {
       final pomo1 = await pomos.create(
-        time: DateTime.now().toUtc(),
+        startTime: DateTime.now().toUtc(),
+        endTime: DateTime.now().toUtc(),
       );
 
       final pomo2 = await pomos.create(
-        time: DateTime.now().toUtc(),
+        startTime: DateTime.now().toUtc(),
+        endTime: DateTime.now().toUtc(),
       );
 
       final pomo3 = await pomos.create(
-        time: DateTime.now().toUtc(),
+        startTime: DateTime.now().toUtc(),
+        endTime: DateTime.now().toUtc(),
       );
 
       expect(await pomos.getAll(), [pomo1, pomo2, pomo3]);
@@ -85,17 +90,20 @@ void main() {
       );
 
       final pomo1 = await pomos.create(
-        time: DateTime.now().toUtc(),
+        startTime: DateTime.now().toUtc(),
+        endTime: DateTime.now().toUtc(),
         task: task,
       );
 
       final pomo2 = await pomos.create(
-        time: DateTime.now().toUtc(),
+        startTime: DateTime.now().toUtc(),
+        endTime: DateTime.now().toUtc(),
         task: task,
       );
 
       final pomo3 = await pomos.create(
-        time: DateTime.now().toUtc(),
+        startTime: DateTime.now().toUtc(),
+        endTime: DateTime.now().toUtc(),
         task: task,
       );
 

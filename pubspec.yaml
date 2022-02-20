@@ -42,6 +42,9 @@ flutter:
         - asset: fonts/Arial_Rounded_MT.ttf
         - asset: fonts/Arial_Rounded_MT_Bold.ttf
           weight: 700
+    - family: CustomIcons
+      fonts:
+        - asset: fonts/CustomIcons.ttf # your font file name and the directory
 
 flutter_native_splash:
   color: "#d95550"

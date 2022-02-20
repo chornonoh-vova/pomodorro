@@ -68,8 +68,12 @@ class TasksTable extends Table {
 }
 
 class PomosTable extends Table {
-  final Column time = const Column(
-    name: 'time',
+  final Column startTime = const Column(
+    name: 'start_time',
+    definition: 'INTEGER NOT NULL',
+  );
+  final Column endTime = const Column(
+    name: 'end_time',
     definition: 'INTEGER NOT NULL',
   );
   final Column taskId = const Column(
@@ -84,7 +88,8 @@ class PomosTable extends Table {
     return '''
       CREATE TABLE $name(
         ${id.name} ${id.definition},
-        ${time.name} ${time.definition},
+        ${startTime.name} ${startTime.definition},
+        ${endTime.name} ${endTime.definition},
         ${taskId.name} ${taskId.definition},
         FOREIGN KEY(${taskId.name}) REFERENCES tasks(id)
       )

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_gen/gen_l10n/localizations.dart';
-
-import 'theme.dart';
-
-import 'screens/home.dart';
-import 'screens/settings.dart';
+import 'package:pomodorro/src/screens/home.dart';
+import 'package:pomodorro/src/theme.dart';
 
 class PomodorroApp extends StatelessWidget {
   const PomodorroApp({Key? key}) : super(key: key);
@@ -21,7 +17,6 @@ class PomodorroApp extends StatelessWidget {
       initialRoute: 'home',
       routes: {
         'home': (context) => const HomeScreen(),
-        'settings': (context) => const SettingsScreen(),
       },
     );
   }

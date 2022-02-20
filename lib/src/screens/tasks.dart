@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+class TasksScreen extends StatefulWidget {
+  const TasksScreen({Key? key}) : super(key: key);
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  State<TasksScreen> createState() => _TasksScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _TasksScreenState extends State<TasksScreen> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Settings')),
+      appBar: AppBar(title: Text('Tasks')),
       body: SafeArea(
         child: Center(
           child: Text(
-            'Settings screen',
+            'Tasks screen',
             style: textTheme.bodyText1,
           ),
         ),

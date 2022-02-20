@@ -5,7 +5,8 @@ import 'package:pomodorro/src/models/task.dart';
 abstract class PomoRepository {
   /// Create item in underlying data source
   Future<Pomo> create({
-    required DateTime time,
+    required DateTime startTime,
+    required DateTime endTime,
     Task? task,
   });
 
@@ -20,7 +21,8 @@ abstract class PomoRepository {
   /// Returns updated item
   Future<Pomo?> update(
     int id, {
-    DateTime? time,
+    DateTime? startTime,
+    DateTime? endTime,
     Task? task,
   });
 

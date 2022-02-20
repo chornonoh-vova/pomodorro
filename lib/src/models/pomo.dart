@@ -4,15 +4,17 @@ import 'task.dart';
 
 class Pomo extends Equatable {
   final int id;
-  final DateTime time;
+  final DateTime startTime;
+  final DateTime endTime;
   final Task? task;
 
   const Pomo({
     required this.id,
-    required this.time,
+    required this.startTime,
+    required this.endTime,
     this.task,
   });
 
   @override
-  List<Object?> get props => [id, time, task];
+  List<Object?> get props => [id, startTime, endTime, task];
 }

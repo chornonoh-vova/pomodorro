@@ -8,23 +8,30 @@ class PomoDto {
   final _tasks = const TasksTable();
 
   int? _id;
-  DateTime? _time;
+  DateTime? _startTime;
+  DateTime? _endTime;
   Task? _task;
 
   PomoDto.fromValues({
     int? id,
-    required DateTime time,
+    required DateTime startTime,
+    required DateTime endTime,
     Task? task,
   }) {
     _id = id;
-    _time = time;
+    _startTime = startTime;
+    _endTime = endTime;
     _task = task;
   }
 
   PomoDto.fromMap(Map<String, dynamic> map) {
     _id = map[_pomos.id.name];
-    _time = DateTime.fromMicrosecondsSinceEpoch(
-      map[_pomos.time.name],
+    _startTime = DateTime.fromMicrosecondsSinceEpoch(
+      map[_pomos.startTime.name],
+      isUtc: true,
+    );
+    _endTime = DateTime.fromMicrosecondsSinceEpoch(
+      map[_pomos.endTime.name],
       isUtc: true,
     );
     _task = map[_pomos.taskId.name] != null
@@ -39,7 +46,8 @@ class PomoDto {
 
   Map<String, dynamic> toMap() {
     var map = {
-      _pomos.time.name: _time?.microsecondsSinceEpoch,
+      _pomos.startTime.name: _startTime?.microsecondsSinceEpoch,
+      _pomos.endTime.name: _endTime?.microsecondsSinceEpoch,
       _pomos.taskId.name: _task?.id,
     };
 
@@ -53,7 +61,9 @@ class PomoDto {
   Pomo toPomo() {
     return Pomo(
       id: _id ?? 0,
-      time: _time ?? DateTime.fromMicrosecondsSinceEpoch(0, isUtc: true),
+      startTime:
+          _startTime ?? DateTime.fromMicrosecondsSinceEpoch(0, isUtc: true),
+      endTime: _endTime ?? DateTime.fromMicrosecondsSinceEpoch(0, isUtc: true),
       task: _task,
     );
   }

@@ -21,20 +21,26 @@ class DbPomoRepository implements PomoRepository {
   }
 
   @override
-  Future<Pomo> create({required DateTime time, Task? task}) async {
+  Future<Pomo> create({
+    required DateTime startTime,
+    required DateTime endTime,
+    Task? task,
+  }) async {
     final db = await _dbHelper.database;
 
     final id = await db.insert(
       _pomos.name,
       PomoDto.fromValues(
-        time: time,
+        startTime: startTime,
+        endTime: endTime,
         task: task,
       ).toMap(),
     );
 
     return Pomo(
       id: id,
-      time: time,
+      startTime: startTime,
+      endTime: endTime,
       task: task,
     );
   }
@@ -53,7 +59,8 @@ class DbPomoRepository implements PomoRepository {
   String _buildRawQuery({String? where, int? limit}) {
     return '''SELECT
         ${_pomos.name}.${_pomos.id.name} as ${_pomos.id.name},
-        ${_pomos.name}.${_pomos.time.name} as ${_pomos.time.name},
+        ${_pomos.name}.${_pomos.startTime.name} as ${_pomos.startTime.name},
+        ${_pomos.name}.${_pomos.endTime.name} as ${_pomos.endTime.name},
         ${_pomos.name}.${_pomos.taskId.name} as ${_pomos.taskId.name},
         ${_tasks.name}.${_tasks.title.name} as ${_tasks.title.name},
         ${_tasks.name}.${_tasks.description.name} as ${_tasks.description.name},
@@ -91,7 +98,12 @@ class DbPomoRepository implements PomoRepository {
   }
 
   @override
-  Future<Pomo?> update(int id, {DateTime? time, Task? task}) async {
+  Future<Pomo?> update(
+    int id, {
+    DateTime? startTime,
+    DateTime? endTime,
+    Task? task,
+  }) async {
     final db = await _dbHelper.database;
 
     final original = await getOne(id);
@@ -101,7 +113,8 @@ class DbPomoRepository implements PomoRepository {
     final updated = await db.update(
       _pomos.name,
       PomoDto.fromValues(
-        time: time ?? original.time,
+        startTime: startTime ?? original.startTime,
+        endTime: endTime ?? original.endTime,
         task: task ?? original.task,
       ).toMap(),
       where: '${_pomos.id.name} = ?',
@@ -112,7 +125,8 @@ class DbPomoRepository implements PomoRepository {
 
     return Pomo(
       id: id,
-      time: time ?? original.time,
+      startTime: startTime ?? original.startTime,
+      endTime: endTime ?? original.endTime,
       task: task ?? original.task,
     );
   }
