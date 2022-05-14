@@ -13,7 +13,7 @@ class _TasksScreenState extends State<TasksScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Tasks')),
+      appBar: AppBar(title: const Text('Tasks')),
       body: SafeArea(
         child: Center(
           child: Text(

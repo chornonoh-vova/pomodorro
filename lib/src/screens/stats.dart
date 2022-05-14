@@ -13,7 +13,7 @@ class _StatsScreenState extends State<StatsScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Stats')),
+      appBar: AppBar(title: const Text('Stats')),
       body: SafeArea(
         child: Center(
           child: Text(

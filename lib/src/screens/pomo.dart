@@ -13,7 +13,7 @@ class _PomoScreenState extends State<PomoScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Pomo')),
+      appBar: AppBar(title: const Text('Pomo')),
       body: SafeArea(
         child: Center(
           child: Text(

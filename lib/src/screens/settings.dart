@@ -13,7 +13,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Settings')),
+      appBar: AppBar(title: const Text('Settings')),
       body: SafeArea(
         child: Center(
           child: Text(
