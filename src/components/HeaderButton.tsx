@@ -7,14 +7,7 @@ type HeaderButtonProps = React.PropsWithChildren<
 
 const HeaderButton = ({ children, onPress }: HeaderButtonProps) => {
   return (
-    <Pressable
-      style={({ pressed }) => [
-        {
-          backgroundColor: pressed ? 'rgb(210, 230, 255)' : 'white',
-        },
-        styles.wrapper,
-      ]}
-      onPress={onPress}>
+    <Pressable style={styles.wrapper} onPress={onPress}>
       {children}
     </Pressable>
   );

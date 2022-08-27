@@ -6,6 +6,8 @@ import MainScreen from './screens/Main';
 import AboutScreen from './screens/About';
 import SettingsScreen from './screens/Settings';
 
+import { useTheme } from './hooks/useTheme';
+
 import { RootStackParamList } from './navigation';
 
 import { name as appName } from '../app.json';
@@ -13,12 +15,18 @@ import { name as appName } from '../app.json';
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
+  const theme = useTheme();
+
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={theme}>
       <RootStack.Navigator
         initialRouteName="Main"
         screenOptions={{
+          headerShadowVisible: false,
           headerTitleAlign: 'center',
+          contentStyle: {
+            backgroundColor: theme.colors.background,
+          },
         }}>
         <RootStack.Screen
           name="Main"
