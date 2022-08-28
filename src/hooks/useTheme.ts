@@ -8,6 +8,7 @@ const LightScheme = {
     background: '#fff',
     text: '#000',
     primary: 'rgb(66, 135, 245)',
+    primaryDarken: 'rgb(11, 92, 221)',
     onPrimary: '#fff',
   },
 };
@@ -18,6 +19,7 @@ const DarkScheme = {
     ...DarkTheme.colors,
     text: '#fff',
     primary: 'rgb(66, 135, 245)',
+    primaryDarken: 'rgb(11, 92, 221)',
     onPrimary: '#fff',
   },
 };

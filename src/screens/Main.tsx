@@ -1,27 +1,35 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import HeaderButton from '../components/HeaderButton';
-import PlayPauseButton from '../components/PlayPauseButton';
-import StopButton from '../components/StopButton';
-import ResetButton from '../components/ResetButton';
+import PlayerActions from '../components/PlayerActions';
 import Countdown from '../components/Countdown';
 
 import { RootStackParamList } from '../navigation';
 
+import { useTheme } from '../hooks/useTheme';
 import { usePomodoroTimer } from '../hooks/usePomodoroTimer';
 
 import IconInfoCircle from '../assets/icons/info-circle.svg';
 import IconSettings from '../assets/icons/settings.svg';
-import { useTheme } from '../hooks/useTheme';
+import { setPomodoroSettings } from '../utils';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
 const MainScreen = ({ navigation }: MainScreenProps) => {
   const theme = useTheme();
+
   const { state, cycle, countdown, part, running, service } =
     usePomodoroTimer();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setPomodoroSettings(service);
+    });
+
+    return unsubscribe;
+  }, [navigation, service]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -50,17 +58,13 @@ const MainScreen = ({ navigation }: MainScreenProps) => {
         {cycle}/{service.current.cycleCount}
       </Text>
 
-      <View style={styles.actions}>
-        <ResetButton onReset={() => service.current.reset()} />
-
-        <PlayPauseButton
-          playing={running}
-          onPlay={() => service.current.play()}
-          onPause={() => service.current.pause()}
-        />
-
-        <StopButton onStop={() => service.current.stop()} />
-      </View>
+      <PlayerActions
+        playing={running}
+        onPlay={() => service.current.play()}
+        onPause={() => service.current.pause()}
+        onReset={() => service.current.reset()}
+        onStop={() => service.current.stop()}
+      />
     </View>
   );
 };
@@ -75,12 +79,6 @@ const styles = StyleSheet.create({
   cycleText: {
     marginTop: 16,
     fontSize: 14,
-  },
-
-  actions: {
-    marginVertical: 32,
-    flexDirection: 'row',
-    alignItems: 'center',
   },
 });
 
