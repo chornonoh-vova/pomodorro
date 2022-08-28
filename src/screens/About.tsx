@@ -63,7 +63,7 @@ const AboutScreen = (_props: AboutScreenProps) => {
         <View style={styles.list}>
           {process.map((item, index) => {
             return (
-              <View style={styles.listItem}>
+              <View key={index} style={styles.listItem}>
                 <Text style={styles.listItemText}>{index + 1}. </Text>
                 <Text style={styles.listItemText}>{item.text}</Text>
               </View>
@@ -80,7 +80,7 @@ const AboutScreen = (_props: AboutScreenProps) => {
         <View style={styles.list}>
           {rules.map((item, index) => {
             return (
-              <View style={styles.listItem}>
+              <View key={index} style={styles.listItem}>
                 <Text style={styles.listItemText}>{index + 1}. </Text>
                 <Text style={styles.listItemText}>
                   <Text style={styles.bold}>{item.title} </Text>
