@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, ScrollView, Pressable, Text } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { RootStackParamList } from '../navigation';
+import type { RootStackParamList } from '../navigation';
+
 import Switcher from '../components/Switcher';
 import NumberInput from '../components/NumberInput';
+import ErrorMessage from '../components/ErrorMessage';
+
+import SettingsModule from '../native/SettingsModule';
 
 import { useTheme } from '../hooks/useTheme';
-import ErrorMessage from '../components/ErrorMessage';
 
 type SettingsScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -27,75 +30,70 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
   const [cycleCount, setCycleCount] = useState(4);
 
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
 
   useEffect(() => {
-    AsyncStorage.multiGet(
-      [
-        '@Pomodorro:autoStart',
-        '@Pomodorro:cycleCount',
-        '@Pomodorro:focusDuration',
-        '@Pomodorro:longBreakDuration',
-        '@Pomodorro:shortBreakDuration',
-      ],
-      (errors, result) => {
-        if (errors?.length) {
-          return;
-        }
-
-        const autoStartRaw = result?.[0]?.[1] || null;
-        const cycleCountRaw = result?.[1]?.[1] || '';
-        const focusDurationRaw = result?.[2]?.[1] || '';
-        const longBreakDurationRaw = result?.[3]?.[1] || '';
-        const shortBreakDurationRaw = result?.[4]?.[1] || '';
-
-        const autoStartSaved = autoStartRaw === 'true';
-        const cycleCountSaved = parseInt(cycleCountRaw, 10);
-        const focusDurationSaved = parseInt(focusDurationRaw, 10);
-        const longBreakDurationSaved = parseInt(longBreakDurationRaw, 10);
-        const shortBreakDurationSaved = parseInt(shortBreakDurationRaw, 10);
-
-        setAutoStart(autoStartSaved);
-
-        if (!isNaN(focusDurationSaved)) {
-          setFocusDuration(focusDurationSaved);
-        }
-
-        if (!isNaN(cycleCountSaved)) {
-          setCycleCount(cycleCountSaved);
-        }
-
-        if (!isNaN(shortBreakDurationSaved)) {
-          setShortBreakDuration(shortBreakDurationSaved);
-        }
-
-        if (!isNaN(longBreakDurationSaved)) {
-          setLongBreakDuration(longBreakDurationSaved);
-        }
+    Promise.all([
+      SettingsModule.getAutoStart(),
+      SettingsModule.getFocusDuration(),
+      SettingsModule.getShortBreakDuration(),
+      SettingsModule.getLongBreakDuration(),
+      SettingsModule.getCycleCount(),
+    ]).then(
+      ([
+        autoStartVal,
+        focusDurationVal,
+        shortBreakDurationVal,
+        longBreakDurationVal,
+        cycleCountVal,
+      ]) => {
+        setAutoStart(autoStartVal);
+        setFocusDuration(focusDurationVal / 60);
+        setShortBreakDuration(shortBreakDurationVal / 60);
+        setLongBreakDuration(longBreakDurationVal / 60);
+        setCycleCount(cycleCountVal);
       },
     );
   }, []);
 
+  const errors = useMemo(() => {
+    let result = [];
+
+    if (focusDuration <= 0) {
+      result.push('Focus time must be greater than 0');
+    }
+
+    if (shortBreakDuration <= 0) {
+      result.push('Short break time must be greater than 0');
+    }
+
+    if (longBreakDuration <= 0) {
+      result.push('Long break time must be greater than 0');
+    }
+
+    if (shortBreakDuration >= longBreakDuration) {
+      result.push('Short break time must be less than long break time');
+    }
+
+    if (longBreakDuration >= focusDuration) {
+      result.push('Long break time must be less than focus time');
+    }
+
+    return result;
+  }, [focusDuration, longBreakDuration, shortBreakDuration]);
+
   const onSave = () => {
     setSaving(true);
 
-    AsyncStorage.multiSet(
-      [
-        ['@Pomodorro:autoStart', autoStart.toString()],
-        ['@Pomodorro:cycleCount', cycleCount.toString()],
-        ['@Pomodorro:focusDuration', focusDuration.toString()],
-        ['@Pomodorro:longBreakDuration', longBreakDuration.toString()],
-        ['@Pomodorro:shortBreakDuration', shortBreakDuration.toString()],
-      ],
-      (errors) => {
-        if (errors?.length) {
-          setError(errors.join('\n'));
-        }
-
-        setSaving(false);
-        navigation.goBack();
-      },
-    );
+    Promise.all([
+      SettingsModule.setAutoStart(autoStart),
+      SettingsModule.setFocusDuration(focusDuration * 60),
+      SettingsModule.setShortBreakDuration(shortBreakDuration * 60),
+      SettingsModule.setLongBreakDuration(longBreakDuration * 60),
+      SettingsModule.setCycleCount(cycleCount),
+    ]).then(() => {
+      setSaving(false);
+      navigation.goBack();
+    });
   };
 
   return (
@@ -135,7 +133,7 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
         onChange={setCycleCount}
       />
 
-      {error && <ErrorMessage error={error} />}
+      {errors.length !== 0 && <ErrorMessage error={errors.join('\n')} />}
 
       <Pressable
         style={({ pressed }) => [
@@ -146,7 +144,7 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
           },
           styles.save,
         ]}
-        disabled={saving}
+        disabled={errors.length !== 0 || saving}
         onPress={onSave}>
         <Text style={[{ color: theme.colors.onPrimary }, styles.saveText]}>
           Save changes
