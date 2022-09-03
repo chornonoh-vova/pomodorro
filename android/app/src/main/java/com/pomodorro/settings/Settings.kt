@@ -49,27 +49,27 @@ class Settings(private val preferences: SharedPreferences) {
     }
 
   companion object {
-    private const val AUTO_START_KEY = "auto-start"
+    const val AUTO_START_KEY = "autoStart"
 
     // automatically start next focus/break
     const val DEFAULT_AUTO_START = false
 
-    private const val FOCUS_DURATION_KEY = "focus-duration"
+    const val FOCUS_DURATION_KEY = "focusDuration"
 
     // focus duration by default is 25 minutes
     const val DEFAULT_FOCUS_DURATION = 25 * 60
 
-    private const val SHORT_BREAK_DURATION_KEY = "short-break-duration"
+    const val SHORT_BREAK_DURATION_KEY = "shortBreakDuration"
 
     // short break duration by default is 5 minutes
     const val DEFAULT_SHORT_BREAK_DURATION = 5 * 60
 
-    private const val LONG_BREAK_DURATION_KEY = "long-break-duration"
+    const val LONG_BREAK_DURATION_KEY = "longBreakDuration"
 
     // long break duration by default is 15 minutes
     const val DEFAULT_LONG_BREAK_DURATION = 15 * 60
 
-    private const val CYCLE_COUNT_KEY = "cycle-count"
+    const val CYCLE_COUNT_KEY = "cycleCount"
 
     // number of cycles by default is 4
     const val DEFAULT_CYCLE_COUNT = 4

@@ -32,27 +32,13 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      SettingsModule.getAutoStart(),
-      SettingsModule.getFocusDuration(),
-      SettingsModule.getShortBreakDuration(),
-      SettingsModule.getLongBreakDuration(),
-      SettingsModule.getCycleCount(),
-    ]).then(
-      ([
-        autoStartVal,
-        focusDurationVal,
-        shortBreakDurationVal,
-        longBreakDurationVal,
-        cycleCountVal,
-      ]) => {
-        setAutoStart(autoStartVal);
-        setFocusDuration(focusDurationVal / 60);
-        setShortBreakDuration(shortBreakDurationVal / 60);
-        setLongBreakDuration(longBreakDurationVal / 60);
-        setCycleCount(cycleCountVal);
-      },
-    );
+    SettingsModule.getAll().then((settings) => {
+      setAutoStart(settings.autoStart);
+      setFocusDuration(settings.focusDuration / 60);
+      setShortBreakDuration(settings.shortBreakDuration / 60);
+      setLongBreakDuration(settings.longBreakDuration / 60);
+      setCycleCount(settings.cycleCount);
+    });
   }, []);
 
   const errors = useMemo(() => {
@@ -84,13 +70,13 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
   const onSave = () => {
     setSaving(true);
 
-    Promise.all([
-      SettingsModule.setAutoStart(autoStart),
-      SettingsModule.setFocusDuration(focusDuration * 60),
-      SettingsModule.setShortBreakDuration(shortBreakDuration * 60),
-      SettingsModule.setLongBreakDuration(longBreakDuration * 60),
-      SettingsModule.setCycleCount(cycleCount),
-    ]).then(() => {
+    SettingsModule.setAll({
+      autoStart,
+      focusDuration: focusDuration * 60,
+      shortBreakDuration: shortBreakDuration * 60,
+      longBreakDuration: longBreakDuration * 60,
+      cycleCount,
+    }).then(() => {
       setSaving(false);
       navigation.goBack();
     });

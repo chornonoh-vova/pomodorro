@@ -2,7 +2,26 @@ import { NativeModules } from 'react-native';
 
 const { SettingsModule } = NativeModules;
 
+type Settings = {
+  autoStart: boolean;
+  focusDuration: number;
+  shortBreakDuration: number;
+  longBreakDuration: number;
+  cycleCount: number;
+};
+
 interface SettingsModuleInterface {
+  /**
+   * Get all settings from storage
+   */
+  getAll(): Promise<Settings>;
+
+  /**
+   * Save new values of settings to storage
+   * @param settings
+   */
+  setAll(settings: Settings): Promise<void>;
+
   /**
    * Get auto start setting from storage
    */
