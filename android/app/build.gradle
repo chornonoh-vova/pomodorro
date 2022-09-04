@@ -76,7 +76,7 @@ apply plugin: "kotlin-android"
  */
 
 project.ext.react = [
-    enableHermes   : false,  // clean and rebuild if changing
+    enableHermes   : true,  // clean and rebuild if changing
     bundleInRelease: true, // bundle JS and assets in release mode
 ]
 
@@ -212,7 +212,7 @@ android {
     abi {
       reset()
       enable enableSeparateBuildPerCPUArchitecture
-      universalApk false  // If true, also generate a universal APK
+      universalApk true  // If true, also generate a universal APK
       include(*reactNativeArchitectures())
     }
   }

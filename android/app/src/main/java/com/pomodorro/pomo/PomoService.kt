@@ -170,6 +170,10 @@ class PomoService : Service() {
         }
       )
 
+      if (settings.autoStart) {
+        setTimeoutAfter(10000)
+      }
+
       build()
     }
   }

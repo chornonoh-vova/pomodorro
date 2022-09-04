@@ -25,14 +25,7 @@ const Switcher = ({ title, subtitle, value, onChange }: SwitcherProps) => {
         </Text>
       </View>
 
-      <Switch
-        thumbColor={theme.colors.primaryDarken}
-        trackColor={{
-          true: theme.colors.primary,
-        }}
-        value={value}
-        onValueChange={onChange}
-      />
+      <Switch value={value} onValueChange={onChange} />
     </View>
   );
 };

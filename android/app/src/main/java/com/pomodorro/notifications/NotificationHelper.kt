@@ -91,7 +91,6 @@ object NotificationHelper {
       setDefaults(Notification.DEFAULT_SOUND or Notification.DEFAULT_VIBRATE)
       setSmallIcon(R.drawable.ic_notification)
       setContentIntent(pendingIntent)
-      setTimeoutAfter(5000)
       setSilent(false)
       setAutoCancel(true)
     }
