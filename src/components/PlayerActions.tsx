@@ -89,12 +89,16 @@ const styles = StyleSheet.create({
   },
 
   centerButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 30,
     padding: 16,
     margin: 8,
   },
 
   sideButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 20,
     padding: 12,
     margin: 8,

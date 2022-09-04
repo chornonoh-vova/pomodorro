@@ -1,7 +1,12 @@
 package com.pomodorro.settings
 
 import androidx.preference.PreferenceManager
-import com.facebook.react.bridge.*
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableMap
 
 class SettingsModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {

@@ -2,26 +2,26 @@ import { useTheme } from '../hooks/useTheme';
 import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { PomodoroState } from '../services/PomodoroService';
+import { PomoState } from '../types/pomo';
 
 import ProgressCircle from './ProgressCircle';
 
 type CountdownProps = {
   time: string;
-  part: number;
-  state: PomodoroState;
+  percent: number;
+  state: PomoState;
 };
 
-const Countdown = ({ time, part, state }: CountdownProps) => {
+const Countdown = ({ time, percent, state }: CountdownProps) => {
   const theme = useTheme();
 
   const subtitle = useMemo(() => {
     switch (state) {
-      case 'FOCUS':
+      case PomoState.FOCUS:
         return 'Time to focus!';
-      case 'SHORT_BREAK':
+      case PomoState.SHORT_BREAK:
         return 'Short break';
-      case 'LONG_BREAK':
+      case PomoState.LONG_BREAK:
         return 'Long break';
     }
   }, [state]);
@@ -30,7 +30,7 @@ const Countdown = ({ time, part, state }: CountdownProps) => {
     <View style={styles.container}>
       <View style={styles.timeWrapper}>
         <ProgressCircle
-          value={part * 100}
+          value={percent}
           width={200}
           height={200}
           color={theme.colors.primary}

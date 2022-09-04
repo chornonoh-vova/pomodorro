@@ -2,10 +2,15 @@ package com.pomodorro
 
 import android.app.Application
 import android.content.Context
-import com.facebook.react.*
+import com.facebook.react.PackageList
+import com.facebook.react.ReactApplication
+import com.facebook.react.ReactInstanceManager
+import com.facebook.react.ReactNativeHost
+import com.facebook.react.ReactPackage
 import com.facebook.react.config.ReactFeatureFlags
 import com.facebook.soloader.SoLoader
 import com.pomodorro.newarchitecture.MainApplicationReactNativeHost
+import com.pomodorro.pomo.PomoPackage
 import com.pomodorro.settings.SettingsPackage
 import java.lang.reflect.InvocationTargetException
 
@@ -16,8 +21,11 @@ class MainApplication : Application(), ReactApplication {
     override fun getPackages(): List<ReactPackage> =
       PackageList(this).packages.apply {
         // Packages that cannot be autolinked yet can be added manually here, for example:
-        // add(new MyReactNativePackage())
+        // add(MyReactNativePackage())
+        // add settings package
         add(SettingsPackage())
+        // add pomo package
+        add(PomoPackage())
       }
 
     override fun getJSMainModuleName() = "index"

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, ScrollView, Pressable, Text } from 'react-native';
+import { StyleSheet, ScrollView, Pressable, Text, View } from 'react-native';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -83,60 +83,62 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Switcher
-        title="Auto start"
-        subtitle="Automatically start next focus or break after previous one ends"
-        value={autoStart}
-        onChange={setAutoStart}
-      />
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <Switcher
+          title="Auto start"
+          subtitle="Automatically start next focus or break after previous one ends"
+          value={autoStart}
+          onChange={setAutoStart}
+        />
 
-      <NumberInput
-        title="Focus (min)"
-        subtitle="Duration of the focus period in minutes"
-        value={focusDuration}
-        onChange={setFocusDuration}
-      />
+        <NumberInput
+          title="Focus (min)"
+          subtitle="Duration of the focus period in minutes"
+          value={focusDuration}
+          onChange={setFocusDuration}
+        />
 
-      <NumberInput
-        title="Short break (min)"
-        subtitle="Duration of the short break between pomodoros in minutes"
-        value={shortBreakDuration}
-        onChange={setShortBreakDuration}
-      />
+        <NumberInput
+          title="Short break (min)"
+          subtitle="Duration of the short break between pomodoros in minutes"
+          value={shortBreakDuration}
+          onChange={setShortBreakDuration}
+        />
 
-      <NumberInput
-        title="Long break (min)"
-        subtitle="Duration of the long break between cycles in minutes"
-        value={longBreakDuration}
-        onChange={setLongBreakDuration}
-      />
+        <NumberInput
+          title="Long break (min)"
+          subtitle="Duration of the long break between cycles in minutes"
+          value={longBreakDuration}
+          onChange={setLongBreakDuration}
+        />
 
-      <NumberInput
-        title="Cycle count"
-        subtitle="Number of cycles to work before long break"
-        value={cycleCount}
-        onChange={setCycleCount}
-      />
+        <NumberInput
+          title="Cycle count"
+          subtitle="Number of cycles to work before long break"
+          value={cycleCount}
+          onChange={setCycleCount}
+        />
 
-      {errors.length !== 0 && <ErrorMessage error={errors.join('\n')} />}
+        {errors.length !== 0 && <ErrorMessage error={errors.join('\n')} />}
 
-      <Pressable
-        style={({ pressed }) => [
-          {
-            backgroundColor: pressed
-              ? theme.colors.primaryDarken
-              : theme.colors.primary,
-          },
-          styles.save,
-        ]}
-        disabled={errors.length !== 0 || saving}
-        onPress={onSave}>
-        <Text style={[{ color: theme.colors.onPrimary }, styles.saveText]}>
-          Save changes
-        </Text>
-      </Pressable>
-    </ScrollView>
+        <Pressable
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed
+                ? theme.colors.primaryDarken
+                : theme.colors.primary,
+            },
+            styles.save,
+          ]}
+          disabled={errors.length !== 0 || saving}
+          onPress={onSave}>
+          <Text style={[{ color: theme.colors.onPrimary }, styles.saveText]}>
+            Save changes
+          </Text>
+        </Pressable>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -145,8 +147,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'stretch',
     justifyContent: 'flex-start',
-    marginHorizontal: 8,
     marginVertical: 16,
+  },
+
+  scrollView: {
+    paddingHorizontal: 20,
   },
 
   save: {

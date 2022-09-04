@@ -1,35 +1,66 @@
-import React, { useEffect, useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { PomoState } from '../types/pomo';
 
 import HeaderButton from '../components/HeaderButton';
 import PlayerActions from '../components/PlayerActions';
 import Countdown from '../components/Countdown';
 
+import PomoModule from '../native/PomoModule';
+import SettingsModule from '../native/SettingsModule';
+
 import { RootStackParamList } from '../navigation';
 
 import { useTheme } from '../hooks/useTheme';
-import { usePomodoroTimer } from '../hooks/usePomodoroTimer';
+import { usePomoTimer } from '../hooks/usePomoTimer';
+import { Orientation, useOrientation } from '../hooks/useOrientation';
 
 import IconInfoCircle from '../assets/icons/info-circle.svg';
 import IconSettings from '../assets/icons/settings.svg';
-import { setPomodoroSettings } from '../utils';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
 const MainScreen = ({ navigation }: MainScreenProps) => {
   const theme = useTheme();
+  const orientation = useOrientation();
 
-  const { state, cycle, countdown, part, running, service } =
-    usePomodoroTimer();
+  const [cycleDuration, setCycleDuration] = useState(0);
+  const [cycleCount, setCycleCount] = useState(4);
+
+  const { running, time, percent, cycle, state } = usePomoTimer(
+    cycleDuration,
+    setCycleDuration,
+  );
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      setPomodoroSettings(service);
+      Promise.all([
+        SettingsModule.getFocusDuration(),
+        SettingsModule.getShortBreakDuration(),
+        SettingsModule.getLongBreakDuration(),
+      ]).then(([focusDuration, shortBreakDuration, longBreakDuration]) => {
+        switch (state) {
+          case PomoState.FOCUS:
+            setCycleDuration(focusDuration);
+            break;
+          case PomoState.SHORT_BREAK:
+            setCycleDuration(shortBreakDuration);
+            break;
+          case PomoState.LONG_BREAK:
+            setCycleDuration(longBreakDuration);
+            break;
+        }
+      });
+
+      SettingsModule.getCycleCount().then((cycleCountVal) =>
+        setCycleCount(cycleCountVal),
+      );
     });
 
     return unsubscribe;
-  }, [navigation, service]);
+  }, [navigation, state]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -51,29 +82,50 @@ const MainScreen = ({ navigation }: MainScreenProps) => {
   }, [navigation, theme]);
 
   return (
-    <View style={styles.container}>
-      <Countdown time={countdown} part={part} state={state} />
+    <View
+      style={[
+        styles.root,
+        styles.container,
+        orientation === Orientation.PORTRAIT
+          ? styles.containerPortrait
+          : styles.containerLandscape,
+      ]}>
+      <View style={styles.container}>
+        <Countdown time={time} percent={percent} state={state} />
 
-      <Text style={[{ color: theme.colors.text }, styles.cycleText]}>
-        {cycle}/{service.current.cycleCount}
-      </Text>
+        <Text style={[{ color: theme.colors.text }, styles.cycleText]}>
+          {cycle}/{cycleCount}
+        </Text>
+      </View>
 
       <PlayerActions
         playing={running}
-        onPlay={() => service.current.play()}
-        onPause={() => service.current.pause()}
-        onReset={() => service.current.reset()}
-        onStop={() => service.current.stop()}
+        onPlay={() => PomoModule.play()}
+        onPause={() => PomoModule.pause()}
+        onStop={() => PomoModule.stop()}
+        onReset={() => PomoModule.reset()}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
+  },
+
+  container: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  containerPortrait: {
+    flexDirection: 'column',
+  },
+
+  containerLandscape: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
   },
 
   cycleText: {
