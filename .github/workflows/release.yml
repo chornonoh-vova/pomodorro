@@ -39,7 +39,7 @@ jobs:
 
       - name: Sign APKs
         uses: r0adkll/sign-android-release@v1
-        id: sign
+        id: sign_apks
         with:
           releaseDirectory: android/app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
@@ -51,12 +51,11 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          title: "Release ${{ github.ref_name }}"
+          prerelease: false
           files: |
-            ${{ steps.sign_app.signedReleaseFile0 }}
-            ${{ steps.sign_app.signedReleaseFile1 }}
-            ${{ steps.sign_app.signedReleaseFile2 }}
-            ${{ steps.sign_app.signedReleaseFile3 }}
-            ${{ steps.sign_app.signedReleaseFile4 }}
+            ${{ steps.sign_apks.signedReleaseFile0 }}
+            ${{ steps.sign_apks.signedReleaseFile1 }}
+            ${{ steps.sign_apks.signedReleaseFile2 }}
+            ${{ steps.sign_apks.signedReleaseFile3 }}
+            ${{ steps.sign_apks.signedReleaseFile4 }}
 
