@@ -158,97 +158,96 @@ android {
       }
     }
   }
-}
 
-if (isNewArchitectureEnabled()) {
-  // We configure the NDK build only if you decide to opt-in for the New Architecture.
-  externalNativeBuild {
-    cmake {
-      path "$projectDir/src/main/jni/CMakeLists.txt"
-    }
-  }
-  def reactAndroidProjectDir = project(':ReactAndroid').projectDir
-  def packageReactNdkDebugLibs = tasks.register("packageReactNdkDebugLibs", Copy) {
-    dependsOn(":ReactAndroid:packageReactNdkDebugLibsForBuck")
-    from("$reactAndroidProjectDir/src/main/jni/prebuilt/lib")
-    into("$buildDir/react-ndk/exported")
-  }
-  def packageReactNdkReleaseLibs = tasks.register("packageReactNdkReleaseLibs", Copy) {
-    dependsOn(":ReactAndroid:packageReactNdkReleaseLibsForBuck")
-    from("$reactAndroidProjectDir/src/main/jni/prebuilt/lib")
-    into("$buildDir/react-ndk/exported")
-  }
-  afterEvaluate {
-    // If you wish to add a custom TurboModule or component locally,
-    // you should uncomment this line.
-    // preBuild.dependsOn("generateCodegenArtifactsFromSchema")
-    preDebugBuild.dependsOn(packageReactNdkDebugLibs)
-    preReleaseBuild.dependsOn(packageReactNdkReleaseLibs)
-
-    // Due to a bug inside AGP, we have to explicitly set a dependency
-    // between configureCMakeDebug* tasks and the preBuild tasks.
-    // This can be removed once this is solved: https://issuetracker.google.com/issues/207403732
-    configureCMakeRelWithDebInfo.dependsOn(preReleaseBuild)
-    configureCMakeDebug.dependsOn(preDebugBuild)
-    reactNativeArchitectures().each { architecture ->
-      tasks.findByName("configureCMakeDebug[${architecture}]")?.configure {
-        dependsOn("preDebugBuild")
-      }
-      tasks.findByName("configureCMakeRelWithDebInfo[${architecture}]")?.configure {
-        dependsOn("preReleaseBuild")
+  if (isNewArchitectureEnabled()) {
+    // We configure the NDK build only if you decide to opt-in for the New Architecture.
+    externalNativeBuild {
+      cmake {
+        path "$projectDir/src/main/jni/CMakeLists.txt"
       }
     }
-  }
-}
+    def reactAndroidProjectDir = project(':ReactAndroid').projectDir
+    def packageReactNdkDebugLibs = tasks.register("packageReactNdkDebugLibs", Copy) {
+      dependsOn(":ReactAndroid:packageReactNdkDebugLibsForBuck")
+      from("$reactAndroidProjectDir/src/main/jni/prebuilt/lib")
+      into("$buildDir/react-ndk/exported")
+    }
+    def packageReactNdkReleaseLibs = tasks.register("packageReactNdkReleaseLibs", Copy) {
+      dependsOn(":ReactAndroid:packageReactNdkReleaseLibsForBuck")
+      from("$reactAndroidProjectDir/src/main/jni/prebuilt/lib")
+      into("$buildDir/react-ndk/exported")
+    }
+    afterEvaluate {
+      // If you wish to add a custom TurboModule or component locally,
+      // you should uncomment this line.
+      // preBuild.dependsOn("generateCodegenArtifactsFromSchema")
+      preDebugBuild.dependsOn(packageReactNdkDebugLibs)
+      preReleaseBuild.dependsOn(packageReactNdkReleaseLibs)
 
-splits {
-  abi {
-    reset()
-    enable enableSeparateBuildPerCPUArchitecture
-    universalApk true  // If true, also generate a universal APK
-    include(*reactNativeArchitectures())
-  }
-}
-signingConfigs {
-  debug {
-    storeFile file('debug.keystore')
-    storePassword 'android'
-    keyAlias 'androiddebugkey'
-    keyPassword 'android'
-  }
-  release {
-    if (project.hasProperty('UPLOAD_STORE_FILE')) {
-      storeFile file(UPLOAD_STORE_FILE)
-      storePassword UPLOAD_STORE_PASSWORD
-      keyAlias UPLOAD_KEY_ALIAS
-      keyPassword UPLOAD_KEY_PASSWORD
+      // Due to a bug inside AGP, we have to explicitly set a dependency
+      // between configureCMakeDebug* tasks and the preBuild tasks.
+      // This can be removed once this is solved: https://issuetracker.google.com/issues/207403732
+      configureCMakeRelWithDebInfo.dependsOn(preReleaseBuild)
+      configureCMakeDebug.dependsOn(preDebugBuild)
+      reactNativeArchitectures().each { architecture ->
+        tasks.findByName("configureCMakeDebug[${architecture}]")?.configure {
+          dependsOn("preDebugBuild")
+        }
+        tasks.findByName("configureCMakeRelWithDebInfo[${architecture}]")?.configure {
+          dependsOn("preReleaseBuild")
+        }
+      }
     }
   }
-}
-buildTypes {
-  debug {
-    signingConfig signingConfigs.debug
-  }
-  release {
-    signingConfig signingConfigs.release
-    minifyEnabled enableProguardInReleaseBuilds
-    proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-  }
-}
 
-// applicationVariants are e.g. debug, release
-applicationVariants.all { variant ->
-  variant.outputs.each { output ->
-    // For each separate APK per architecture, set a unique version code as described here:
-    // https://developer.android.com/studio/build/configure-apk-splits.html
-    // Example: versionCode 1 will generate 1001 for armeabi-v7a, 1002 for x86, etc.
-    def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
-    def abi = output.getFilter(com.android.build.OutputFile.ABI)
-    if (abi != null) {  // null for the universal-debug, universal-release variants
-      output.versionCodeOverride =
-          defaultConfig.versionCode * 1000 + versionCodes.get(abi)
+  splits {
+    abi {
+      reset()
+      enable enableSeparateBuildPerCPUArchitecture
+      universalApk true  // If true, also generate a universal APK
+      include(*reactNativeArchitectures())
     }
+  }
+  signingConfigs {
+    debug {
+      storeFile file('debug.keystore')
+      storePassword 'android'
+      keyAlias 'androiddebugkey'
+      keyPassword 'android'
+    }
+    release {
+      if (project.hasProperty('UPLOAD_STORE_FILE')) {
+        storeFile file(UPLOAD_STORE_FILE)
+        storePassword UPLOAD_STORE_PASSWORD
+        keyAlias UPLOAD_KEY_ALIAS
+        keyPassword UPLOAD_KEY_PASSWORD
+      }
+    }
+  }
+  buildTypes {
+    debug {
+      signingConfig signingConfigs.debug
+    }
+    release {
+      signingConfig signingConfigs.release
+      minifyEnabled enableProguardInReleaseBuilds
+      proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+    }
+  }
 
+  // applicationVariants are e.g. debug, release
+  applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+      // For each separate APK per architecture, set a unique version code as described here:
+      // https://developer.android.com/studio/build/configure-apk-splits.html
+      // Example: versionCode 1 will generate 1001 for armeabi-v7a, 1002 for x86, etc.
+      def versionCodes = ["armeabi-v7a": 1, "x86": 2, "arm64-v8a": 3, "x86_64": 4]
+      def abi = output.getFilter(com.android.build.OutputFile.ABI)
+      if (abi != null) {  // null for the universal-debug, universal-release variants
+        output.versionCodeOverride =
+            defaultConfig.versionCode * 1000 + versionCodes.get(abi)
+      }
+    }
   }
 }
 
