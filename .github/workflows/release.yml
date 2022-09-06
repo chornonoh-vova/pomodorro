@@ -52,5 +52,5 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           files: |
-            android/app/build/outputs/apk/release/*.apk
+            android/app/build/outputs/apk/release/*signed.apk
 
