@@ -31,15 +31,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-
       - name: Build APKs
-        run: cd android && ./gradlew assembleRelease --no-daemon
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: assembleRelease --no-daemon
+          build-root-directory: android
 
       - name: Sign APKs
         uses: r0adkll/sign-android-release@v1
-        id: sign_apks
+        id: sign_app
         with:
           releaseDirectory: android/app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
@@ -53,9 +53,9 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           files: |
-            ${{ steps.sign_apks.signedReleaseFile0 }}
-            ${{ steps.sign_apks.signedReleaseFile1 }}
-            ${{ steps.sign_apks.signedReleaseFile2 }}
-            ${{ steps.sign_apks.signedReleaseFile3 }}
-            ${{ steps.sign_apks.signedReleaseFile4 }}
+            ${{ steps.sign_app.outputs.signedReleaseFile0 }}
+            ${{ steps.sign_app.outputs.signedReleaseFile1 }}
+            ${{ steps.sign_app.outputs.signedReleaseFile2 }}
+            ${{ steps.sign_app.outputs.signedReleaseFile3 }}
+            ${{ steps.sign_app.outputs.signedReleaseFile4 }}
 
