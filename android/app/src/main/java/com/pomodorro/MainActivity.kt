@@ -1,6 +1,5 @@
 package com.pomodorro
 
-import android.os.Bundle
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.ReactRootView
@@ -18,10 +17,6 @@ class MainActivity : ReactActivity() {
    * (Paper).
    */
   override fun createReactActivityDelegate() = MainActivityDelegate(this, mainComponentName)
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-  }
 
   class MainActivityDelegate(activity: ReactActivity?, mainComponentName: String?) :
     ReactActivityDelegate(activity, mainComponentName) {

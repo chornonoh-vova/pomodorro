@@ -7,69 +7,65 @@ import android.content.SharedPreferences
  */
 class Settings(private val preferences: SharedPreferences) {
   var autoStart: Boolean
-    get() = preferences.getBoolean(AUTO_START_KEY, DEFAULT_AUTO_START)
+    get() = preferences.getBoolean(SettingsData.AUTO_START_KEY, SettingsData.DEFAULT_AUTO_START)
     set(value) {
       preferences.edit().run {
-        putBoolean(AUTO_START_KEY, value)
+        putBoolean(SettingsData.AUTO_START_KEY, value)
         apply()
       }
     }
 
   var focusDuration: Int
-    get() = preferences.getInt(FOCUS_DURATION_KEY, DEFAULT_FOCUS_DURATION)
+    get() = preferences.getInt(SettingsData.FOCUS_DURATION_KEY, SettingsData.DEFAULT_FOCUS_DURATION)
     set(value) {
       preferences.edit().run {
-        putInt(FOCUS_DURATION_KEY, value)
+        putInt(SettingsData.FOCUS_DURATION_KEY, value)
         apply()
       }
     }
 
   var shortBreakDuration: Int
-    get() = preferences.getInt(SHORT_BREAK_DURATION_KEY, DEFAULT_SHORT_BREAK_DURATION)
+    get() = preferences.getInt(
+      SettingsData.SHORT_BREAK_DURATION_KEY,
+      SettingsData.DEFAULT_SHORT_BREAK_DURATION
+    )
     set(value) {
       preferences.edit().run {
-        putInt(SHORT_BREAK_DURATION_KEY, value)
+        putInt(SettingsData.SHORT_BREAK_DURATION_KEY, value)
         apply()
       }
     }
 
   var longBreakDuration: Int
-    get() = preferences.getInt(LONG_BREAK_DURATION_KEY, DEFAULT_LONG_BREAK_DURATION)
+    get() = preferences.getInt(
+      SettingsData.LONG_BREAK_DURATION_KEY,
+      SettingsData.DEFAULT_LONG_BREAK_DURATION
+    )
     set(value) {
       preferences.edit().apply {
-        putInt(LONG_BREAK_DURATION_KEY, value)
+        putInt(SettingsData.LONG_BREAK_DURATION_KEY, value)
         apply()
       }
     }
 
   var cycleCount: Int
-    get() = preferences.getInt(CYCLE_COUNT_KEY, DEFAULT_CYCLE_COUNT)
+    get() = preferences.getInt(SettingsData.CYCLE_COUNT_KEY, SettingsData.DEFAULT_CYCLE_COUNT)
     set(value) {
       preferences.edit().apply {
-        putInt(CYCLE_COUNT_KEY, value)
+        putInt(SettingsData.CYCLE_COUNT_KEY, value)
         apply()
       }
     }
 
-  companion object {
-    // automatically start next focus/break
-    const val AUTO_START_KEY = "autoStart"
-    const val DEFAULT_AUTO_START = false
-
-    // focus duration by default is 25 minutes
-    const val FOCUS_DURATION_KEY = "focusDuration"
-    const val DEFAULT_FOCUS_DURATION = 25 * 60
-
-    // short break duration by default is 5 minutes
-    const val SHORT_BREAK_DURATION_KEY = "shortBreakDuration"
-    const val DEFAULT_SHORT_BREAK_DURATION = 5 * 60
-
-    // long break duration by default is 15 minutes
-    const val LONG_BREAK_DURATION_KEY = "longBreakDuration"
-    const val DEFAULT_LONG_BREAK_DURATION = 15 * 60
-
-    // number of cycles by default is 4
-    const val CYCLE_COUNT_KEY = "cycleCount"
-    const val DEFAULT_CYCLE_COUNT = 4
-  }
+  var all: SettingsData
+    get() = SettingsData(
+      autoStart, focusDuration, shortBreakDuration, longBreakDuration, cycleCount
+    )
+    set(value) {
+      autoStart = value.autoStart
+      focusDuration = value.focusDuration
+      shortBreakDuration = value.shortBreakDuration
+      longBreakDuration = value.longBreakDuration
+      cycleCount = value.cycleCount
+    }
 }

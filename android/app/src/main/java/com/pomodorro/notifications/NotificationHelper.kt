@@ -1,6 +1,5 @@
 package com.pomodorro.notifications
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -28,11 +27,7 @@ object NotificationHelper {
       flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
     }
 
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-    } else {
-      PendingIntent.getActivity(context, 0, intent, 0)
-    }
+    return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
   }
 
   /**
@@ -71,7 +66,6 @@ object NotificationHelper {
   /**
    * Get notification builder for pomo active notification
    */
-  @SuppressLint("UnspecifiedImmutableFlag")
   fun getPomoActiveBuilder(context: Context): NotificationCompat.Builder {
     createChannel(
       context,
@@ -94,7 +88,6 @@ object NotificationHelper {
   /**
    * Get notification builder for pomo current notification
    */
-  @SuppressLint("UnspecifiedImmutableFlag")
   fun getPomoCurrentBuilder(context: Context): NotificationCompat.Builder {
     createChannel(
       context,

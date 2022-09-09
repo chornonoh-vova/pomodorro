@@ -1,7 +1,6 @@
 package com.pomodorro.settings
 
 import androidx.preference.PreferenceManager
-import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -18,26 +17,13 @@ class SettingsModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun getAll(promise: Promise) {
-    val params = Arguments.createMap().apply {
-      putBoolean(Settings.AUTO_START_KEY, settings.autoStart)
-      putInt(Settings.FOCUS_DURATION_KEY, settings.focusDuration)
-      putInt(Settings.SHORT_BREAK_DURATION_KEY, settings.shortBreakDuration)
-      putInt(Settings.LONG_BREAK_DURATION_KEY, settings.longBreakDuration)
-      putInt(Settings.CYCLE_COUNT_KEY, settings.cycleCount)
-    }
-
-    promise.resolve(params)
+    promise.resolve(settings.all.toMap())
   }
 
   @ReactMethod
   fun setAll(params: ReadableMap, promise: Promise) {
-    settings.autoStart = params.getBoolean(Settings.AUTO_START_KEY)
-    settings.focusDuration = params.getInt(Settings.FOCUS_DURATION_KEY)
-    settings.shortBreakDuration = params.getInt(Settings.SHORT_BREAK_DURATION_KEY)
-    settings.longBreakDuration = params.getInt(Settings.LONG_BREAK_DURATION_KEY)
-    settings.cycleCount = params.getInt(Settings.CYCLE_COUNT_KEY)
-
-    promise.resolve(params)
+    settings.all = SettingsData.fromMap(params)
+    promise.resolve(settings.all.toMap())
   }
 
   @ReactMethod

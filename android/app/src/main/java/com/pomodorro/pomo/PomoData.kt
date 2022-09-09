@@ -18,7 +18,7 @@ data class PomoData(
    */
   fun toMap(): WritableMap = Arguments.createMap().apply {
     putBoolean("timerRunning", timerRunning)
-    putString("currentState", currentState.desc)
+    putString("currentState", currentState.key)
     putInt("currentSecond", currentSecond)
     putInt("currentCycle", currentCycle)
     putInt("currentCycleDuration", currentCycleDuration)

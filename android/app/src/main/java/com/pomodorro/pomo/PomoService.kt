@@ -1,12 +1,10 @@
 package com.pomodorro.pomo
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
-import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.pomodorro.BuildConfig
@@ -58,7 +56,7 @@ class PomoService : Service() {
           reset()
 
           // remove notifications
-          stopForeground(true)
+          stopForeground(STOP_FOREGROUND_REMOVE)
           pomoCurrentCancel()
 
           // stop service
@@ -102,13 +100,7 @@ class PomoService : Service() {
   }
 
   private fun getPomoActiveTitle(): String {
-    val stateText = when (currentState) {
-      PomoState.FOCUS -> "Focus"
-      PomoState.SHORT_BREAK -> "Short break"
-      PomoState.LONG_BREAK -> "Long break"
-    }
-
-    return "$stateText $currentCycle/${settings.cycleCount}"
+    return "${currentState.shortDescription} $currentCycle/${settings.cycleCount}"
   }
 
   private fun getPomoActiveText(): String {
@@ -123,17 +115,12 @@ class PomoService : Service() {
   /**
    * Helper for getting pending intents for notification actions
    */
-  @SuppressLint("UnspecifiedImmutableFlag")
   private fun buildPendingAction(actionToPerform: String): PendingIntent {
     val intent = Intent(this, PomoService::class.java).apply {
       action = actionToPerform
     }
 
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-    } else {
-      PendingIntent.getService(this, 0, intent, 0)
-    }
+    return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
   }
 
   /**
@@ -147,7 +134,7 @@ class PomoService : Service() {
       if (isTimerRunning()) {
         addAction(R.drawable.ic_baseline_pause_24, "Pause", buildPendingAction(ACTION_PAUSE))
       } else {
-        addAction(R.drawable.ic_baseline_play_arrow_24, "Play", buildPendingAction(ACTION_PLAY))
+        addAction(R.drawable.ic_baseline_play_arrow_24, "Continue", buildPendingAction(ACTION_PLAY))
       }
 
       addAction(R.drawable.ic_baseline_stop_24, "Stop", buildPendingAction(ACTION_STOP))
@@ -162,13 +149,7 @@ class PomoService : Service() {
   private fun buildPomoCurrent(): Notification {
     return NotificationHelper.getPomoCurrentBuilder(this).run {
       setContentTitle(getPomoActiveTitle())
-      setContentText(
-        when (currentState) {
-          PomoState.FOCUS -> "Time to focus!"
-          PomoState.SHORT_BREAK -> "Time for a short break!"
-          PomoState.LONG_BREAK -> "Time for a long break!"
-        }
-      )
+      setContentText(currentState.longDescription)
 
       if (settings.autoStart) {
         setTimeoutAfter(10000)
