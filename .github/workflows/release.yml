@@ -42,6 +42,7 @@ jobs:
         with:
           arguments: assembleRelease --no-daemon
           build-root-directory: android
+
       - name: Rename APKs
         run: |
           for f in android/app/build/outputs/apk/release/*.apk;
@@ -112,8 +113,9 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON_TEXT }}
-          packageName: com.pomodorro
+          packageName: com.pomodorro.Pomodorro
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           releaseName: ${{ env.RELEASE_VERSION }}
           track: ${{ env.RELEASE_TRACK }}
-          status: completed
+          mappingFile: android/app/build/outputs/mapping/release/mapping.txt
+          debugSymbols: android/app/intermediates/merged_native_libs/release/out/lib
