@@ -117,5 +117,8 @@ jobs:
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           releaseName: ${{ env.RELEASE_VERSION }}
           track: ${{ env.RELEASE_TRACK }}
+          status: completed
+          inAppUpdatePriority: 2
+          userFraction: 1.0
           mappingFile: android/app/build/outputs/mapping/release/mapping.txt
           debugSymbols: android/app/intermediates/merged_native_libs/release/out/lib
