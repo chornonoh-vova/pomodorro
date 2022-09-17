@@ -42,6 +42,12 @@ jobs:
         with:
           arguments: assembleRelease --no-daemon
           build-root-directory: android
+      - name: Rename APKs
+        run: |
+          for f in android/app/build/outputs/apk/release/*.apk;
+          do
+            mv "$f" "$(echo "$f" | sed s/release-unsigned/release/)";
+          done
 
       - name: Sign APKs
         uses: r0adkll/sign-android-release@v1
@@ -107,7 +113,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON_TEXT }}
           packageName: com.pomodorro
-          releaseFiles: android/app/build/outputs/bundle/release/*signed.aab
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           releaseName: ${{ env.RELEASE_VERSION }}
           track: ${{ env.RELEASE_TRACK }}
           status: completed
