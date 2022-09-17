@@ -113,7 +113,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON_TEXT }}
-          packageName: com.pomodorro.Pomodorro
+          packageName: com.pomodorro
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           releaseName: ${{ env.RELEASE_VERSION }}
           track: ${{ env.RELEASE_TRACK }}
