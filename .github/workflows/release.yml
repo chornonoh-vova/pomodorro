@@ -56,7 +56,7 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          prerelease: ${{ env.track != 'production' }}
+          prerelease: ${{ env.RELEASE_TRACK != 'production' }}
           files: |
             android/app/build/outputs/apk/release/*signed.apk
 
@@ -108,6 +108,6 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON_TEXT }}
           packageName: com.pomodorro
           releaseFiles: android/app/build/outputs/bundle/release/*signed.aab
-          releaseName: ${{ github.ref_name }}
-          track: ${{ env.track }}
+          releaseName: ${{ env.RELEASE_VERSION }}
+          track: ${{ env.RELEASE_TRACK }}
           status: completed
