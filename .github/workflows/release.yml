@@ -119,6 +119,5 @@ jobs:
           track: ${{ env.RELEASE_TRACK }}
           status: completed
           inAppUpdatePriority: 2
-          userFraction: 1.0
           mappingFile: android/app/build/outputs/mapping/release/mapping.txt
           debugSymbols: android/app/intermediates/merged_native_libs/release/out/lib
