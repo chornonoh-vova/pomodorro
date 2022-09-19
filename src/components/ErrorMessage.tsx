@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import IconAlertTriangle from '../assets/icons/alert-triangle.svg';
@@ -6,11 +6,11 @@ import IconAlertTriangle from '../assets/icons/alert-triangle.svg';
 const textColor = 'rgb(176, 0, 32)';
 const backgroundColor = 'rgba(176, 0, 32, 0.25)';
 
-const ErrorMessage = ({ error }: { error: string }) => {
+const ErrorMessage = ({ children }: { children: ReactNode }) => {
   return (
     <View style={styles.wrapper}>
       <IconAlertTriangle color={textColor} width={24} height={24} />
-      <Text style={styles.message}>{error}</Text>
+      <Text style={styles.message}>{children}</Text>
     </View>
   );
 };
@@ -23,7 +23,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: textColor,
     borderWidth: 1,
-    marginTop: 32,
   },
 
   message: {

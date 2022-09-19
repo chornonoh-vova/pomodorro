@@ -12,6 +12,7 @@ import com.facebook.soloader.SoLoader
 import com.pomodorro.newarchitecture.MainApplicationReactNativeHost
 import com.pomodorro.pomo.PomoPackage
 import com.pomodorro.settings.SettingsPackage
+import com.tencent.mmkv.MMKV
 import java.lang.reflect.InvocationTargetException
 
 class MainApplication : Application(), ReactApplication {
@@ -46,6 +47,8 @@ class MainApplication : Application(), ReactApplication {
     ReactFeatureFlags.useTurboModules = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
     SoLoader.init(this,  /* native exopackage */false)
     initializeFlipper(this, reactNativeHost.reactInstanceManager)
+
+    MMKV.initialize(this)
   }
 
   companion object {

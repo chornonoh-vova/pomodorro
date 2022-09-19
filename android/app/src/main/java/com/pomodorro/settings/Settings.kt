@@ -1,60 +1,47 @@
 package com.pomodorro.settings
 
-import android.content.SharedPreferences
+import com.tencent.mmkv.MMKV
 
 /**
  * Settings util class
  */
-class Settings(private val preferences: SharedPreferences) {
+class Settings {
+  private val kv = MMKV.defaultMMKV(MMKV.MULTI_PROCESS_MODE, null)
+
   var autoStart: Boolean
-    get() = preferences.getBoolean(SettingsData.AUTO_START_KEY, SettingsData.DEFAULT_AUTO_START)
+    get() = kv.decodeBool(SettingsData.AUTO_START_KEY, SettingsData.DEFAULT_AUTO_START)
     set(value) {
-      preferences.edit().run {
-        putBoolean(SettingsData.AUTO_START_KEY, value)
-        apply()
-      }
+      kv.encode(SettingsData.AUTO_START_KEY, value)
     }
 
   var focusDuration: Int
-    get() = preferences.getInt(SettingsData.FOCUS_DURATION_KEY, SettingsData.DEFAULT_FOCUS_DURATION)
+    get() = kv.decodeInt(SettingsData.FOCUS_DURATION_KEY, SettingsData.DEFAULT_FOCUS_DURATION)
     set(value) {
-      preferences.edit().run {
-        putInt(SettingsData.FOCUS_DURATION_KEY, value)
-        apply()
-      }
+      kv.encode(SettingsData.FOCUS_DURATION_KEY, value)
     }
 
   var shortBreakDuration: Int
-    get() = preferences.getInt(
+    get() = kv.decodeInt(
       SettingsData.SHORT_BREAK_DURATION_KEY,
       SettingsData.DEFAULT_SHORT_BREAK_DURATION
     )
     set(value) {
-      preferences.edit().run {
-        putInt(SettingsData.SHORT_BREAK_DURATION_KEY, value)
-        apply()
-      }
+      kv.encode(SettingsData.SHORT_BREAK_DURATION_KEY, value)
     }
 
   var longBreakDuration: Int
-    get() = preferences.getInt(
+    get() = kv.decodeInt(
       SettingsData.LONG_BREAK_DURATION_KEY,
       SettingsData.DEFAULT_LONG_BREAK_DURATION
     )
     set(value) {
-      preferences.edit().apply {
-        putInt(SettingsData.LONG_BREAK_DURATION_KEY, value)
-        apply()
-      }
+      kv.encode(SettingsData.LONG_BREAK_DURATION_KEY, value)
     }
 
   var cycleCount: Int
-    get() = preferences.getInt(SettingsData.CYCLE_COUNT_KEY, SettingsData.DEFAULT_CYCLE_COUNT)
+    get() = kv.decodeInt(SettingsData.CYCLE_COUNT_KEY, SettingsData.DEFAULT_CYCLE_COUNT)
     set(value) {
-      preferences.edit().apply {
-        putInt(SettingsData.CYCLE_COUNT_KEY, value)
-        apply()
-      }
+      kv.encode(SettingsData.CYCLE_COUNT_KEY, value)
     }
 
   var all: SettingsData

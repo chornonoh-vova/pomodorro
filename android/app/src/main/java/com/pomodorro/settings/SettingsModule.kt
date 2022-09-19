@@ -1,6 +1,5 @@
 package com.pomodorro.settings
 
-import androidx.preference.PreferenceManager
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -9,9 +8,7 @@ import com.facebook.react.bridge.ReadableMap
 
 class SettingsModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
-  private val preferences = PreferenceManager.getDefaultSharedPreferences(reactApplicationContext)
-
-  private val settings = Settings(preferences)
+  private val settings = Settings()
 
   override fun getName() = "SettingsModule"
 

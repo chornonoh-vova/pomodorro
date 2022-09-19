@@ -31,8 +31,8 @@ const Countdown = ({ time, percent, state }: CountdownProps) => {
       <View style={styles.timeWrapper}>
         <ProgressCircle
           value={percent}
-          width={200}
-          height={200}
+          width={250}
+          height={250}
           color={theme.colors.primary}
         />
 
@@ -56,8 +56,8 @@ const styles = StyleSheet.create({
   timeWrapper: {
     position: 'relative',
 
-    width: 200,
-    height: 200,
+    width: 250,
+    height: 250,
 
     alignItems: 'center',
     justifyContent: 'center',

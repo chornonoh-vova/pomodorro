@@ -17,7 +17,7 @@ import { useTheme } from '../hooks/useTheme';
 import { usePomoTimer } from '../hooks/usePomoTimer';
 import { Orientation, useOrientation } from '../hooks/useOrientation';
 
-import IconInfoCircle from '../assets/icons/info-circle.svg';
+import InfoIcon from '../assets/icons/info.svg';
 import IconSettings from '../assets/icons/settings.svg';
 
 type MainScreenProps = NativeStackScreenProps<RootStackParamList, 'Main'>;
@@ -67,7 +67,7 @@ const MainScreen = ({ navigation }: MainScreenProps) => {
       headerLeft: () => {
         return (
           <HeaderButton onPress={() => navigation.navigate('About')}>
-            <IconInfoCircle color={theme.colors.text} width={24} height={24} />
+            <InfoIcon color={theme.colors.text} width={24} height={24} />
           </HeaderButton>
         );
       },

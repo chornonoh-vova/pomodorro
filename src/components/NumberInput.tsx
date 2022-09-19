@@ -1,55 +1,64 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import {
+  FieldPath,
+  FieldValues,
+  useController,
+  UseControllerProps,
+} from 'react-hook-form';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useTheme } from '../hooks/useTheme';
+import ErrorMessage from './ErrorMessage';
 
-type NumberInputProps = {
-  title: string;
-  subtitle?: string;
-  value: number;
-  onChange: (value: number) => void;
-};
-
-const NumberInput = ({
+const NumberInput = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  control,
   title,
   subtitle,
-  value,
-  onChange,
-}: NumberInputProps) => {
+  ...props
+}: UseControllerProps<TFieldValues, TName> & {
+  title: string;
+  subtitle?: string;
+}) => {
   const theme = useTheme();
 
-  const [internalValue, setInternalValue] = useState(value.toString());
-
-  useEffect(() => {
-    setInternalValue(value.toString());
-  }, [value]);
-
-  useEffect(() => {
-    const parsed = parseInt(internalValue, 10);
-
-    if (!isNaN(parsed)) {
-      onChange(parsed);
-    }
-  }, [internalValue, onChange]);
+  const {
+    field: { ref, value, onChange, onBlur },
+    fieldState: { error },
+  } = useController<TFieldValues, TName>({
+    control,
+    ...props,
+  });
 
   return (
-    <View style={styles.inputWrapper}>
-      <View style={styles.inputDescription}>
-        <Text style={[{ color: theme.colors.text }, styles.title]}>
-          {title}
-        </Text>
+    <View>
+      <View style={styles.inputWrapper}>
+        <View style={styles.inputDescription}>
+          <Text style={[{ color: theme.colors.text }, styles.title]}>
+            {title}
+          </Text>
 
-        <Text style={[{ color: theme.colors.text }, styles.subtitle]}>
-          {subtitle}
-        </Text>
+          <Text style={[{ color: theme.colors.text }, styles.subtitle]}>
+            {subtitle}
+          </Text>
+        </View>
+
+        <TextInput
+          ref={ref}
+          style={styles.input}
+          value={value.toString()}
+          onBlur={onBlur}
+          onChangeText={(e) => {
+            const parsed = parseInt(e, 10);
+            onChange(isNaN(parsed) ? '' : parsed);
+          }}
+          keyboardType="numeric"
+        />
       </View>
 
-      <TextInput
-        style={styles.input}
-        value={internalValue}
-        onChangeText={setInternalValue}
-        keyboardType="numeric"
-      />
+      {error && <ErrorMessage>{error.message}</ErrorMessage>}
     </View>
   );
 };

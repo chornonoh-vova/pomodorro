@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, ScrollView, Pressable, Text, View } from 'react-native';
+import { useForm } from 'react-hook-form';
 
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -7,7 +8,6 @@ import type { RootStackParamList } from '../navigation';
 
 import Switcher from '../components/Switcher';
 import NumberInput from '../components/NumberInput';
-import ErrorMessage from '../components/ErrorMessage';
 
 import SettingsModule from '../native/SettingsModule';
 
@@ -18,109 +18,143 @@ type SettingsScreenProps = NativeStackScreenProps<
   'Settings'
 >;
 
+type SettingsFormData = {
+  autoStart: boolean;
+  focusDuration: number;
+  shortBreakDuration: number;
+  longBreakDuration: number;
+  cycleCount: number;
+};
+
 const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
   const theme = useTheme();
 
-  const [autoStart, setAutoStart] = useState(false);
-
-  const [focusDuration, setFocusDuration] = useState(25);
-  const [shortBreakDuration, setShortBreakDuration] = useState(5);
-  const [longBreakDuration, setLongBreakDuration] = useState(15);
-
-  const [cycleCount, setCycleCount] = useState(4);
-
   const [saving, setSaving] = useState(false);
 
+  const { control, setValue, handleSubmit } = useForm<SettingsFormData>({
+    defaultValues: {
+      autoStart: false,
+      focusDuration: 25,
+      shortBreakDuration: 5,
+      longBreakDuration: 15,
+      cycleCount: 4,
+    },
+  });
+
   useEffect(() => {
+    const start = new Date().getUTCMilliseconds();
+
     SettingsModule.getAll().then((settings) => {
-      setAutoStart(settings.autoStart);
-      setFocusDuration(settings.focusDuration / 60);
-      setShortBreakDuration(settings.shortBreakDuration / 60);
-      setLongBreakDuration(settings.longBreakDuration / 60);
-      setCycleCount(settings.cycleCount);
+      const end = new Date().getUTCMilliseconds();
+      console.log('get all settings:', end - start);
+
+      setValue('autoStart', settings.autoStart);
+      setValue('focusDuration', settings.focusDuration / 60);
+      setValue('shortBreakDuration', settings.shortBreakDuration / 60);
+      setValue('longBreakDuration', settings.longBreakDuration / 60);
+      setValue('cycleCount', settings.cycleCount);
     });
-  }, []);
+  }, [setValue]);
 
-  const errors = useMemo(() => {
-    let result = [];
+  const onSave = useCallback(
+    (data: SettingsFormData) => {
+      setSaving(true);
 
-    if (focusDuration <= 0) {
-      result.push('Focus time must be greater than 0');
-    }
-
-    if (shortBreakDuration <= 0) {
-      result.push('Short break time must be greater than 0');
-    }
-
-    if (longBreakDuration <= 0) {
-      result.push('Long break time must be greater than 0');
-    }
-
-    if (shortBreakDuration >= longBreakDuration) {
-      result.push('Short break time must be less than long break time');
-    }
-
-    if (longBreakDuration >= focusDuration) {
-      result.push('Long break time must be less than focus time');
-    }
-
-    return result;
-  }, [focusDuration, longBreakDuration, shortBreakDuration]);
-
-  const onSave = () => {
-    setSaving(true);
-
-    SettingsModule.setAll({
-      autoStart,
-      focusDuration: focusDuration * 60,
-      shortBreakDuration: shortBreakDuration * 60,
-      longBreakDuration: longBreakDuration * 60,
-      cycleCount,
-    }).then(() => {
-      setSaving(false);
-      navigation.goBack();
-    });
-  };
+      SettingsModule.setAll({
+        autoStart: data.autoStart,
+        focusDuration: data.focusDuration * 60,
+        shortBreakDuration: data.shortBreakDuration * 60,
+        longBreakDuration: data.longBreakDuration * 60,
+        cycleCount: data.cycleCount,
+      }).then(() => {
+        setSaving(false);
+        navigation.goBack();
+      });
+    },
+    [navigation],
+  );
 
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <Switcher
+          control={control}
+          name="autoStart"
           title="Auto start"
           subtitle="Automatically start next focus or break after previous one ends"
-          value={autoStart}
-          onChange={setAutoStart}
         />
 
         <NumberInput
+          control={control}
+          name="focusDuration"
           title="Focus (min)"
           subtitle="Duration of the focus period in minutes"
-          value={focusDuration}
-          onChange={setFocusDuration}
+          rules={{
+            required: 'Focus duration is required',
+            min: {
+              value: 5,
+              message: 'Minimal focus duration is 5 minutes',
+            },
+            max: {
+              value: 180,
+              message: 'Maximum focus duration is 180 minutes',
+            },
+          }}
         />
 
         <NumberInput
+          control={control}
+          name="shortBreakDuration"
           title="Short break (min)"
           subtitle="Duration of the short break between pomodoros in minutes"
-          value={shortBreakDuration}
-          onChange={setShortBreakDuration}
+          rules={{
+            required: 'Short break duration is required',
+            min: {
+              value: 1,
+              message: 'Minimal short break duration is 1 minute',
+            },
+            max: {
+              value: 60,
+              message: 'Maximum short break duration is 60 minutes',
+            },
+          }}
         />
 
         <NumberInput
+          control={control}
+          name="longBreakDuration"
           title="Long break (min)"
           subtitle="Duration of the long break between cycles in minutes"
-          value={longBreakDuration}
-          onChange={setLongBreakDuration}
+          rules={{
+            required: 'Long break duration is required',
+            min: {
+              value: 1,
+              message: 'Minimal long break duration is 1 minute',
+            },
+            max: {
+              value: 60,
+              message: 'Maximum long break duration is 60 minutes',
+            },
+          }}
         />
 
         <NumberInput
+          control={control}
+          name="cycleCount"
           title="Cycle count"
           subtitle="Number of cycles to work before long break"
-          value={cycleCount}
-          onChange={setCycleCount}
+          rules={{
+            required: 'Cycle count is required',
+            min: {
+              value: 1,
+              message: 'Minimal cycle count is 1 minute',
+            },
+            max: {
+              value: 60,
+              message: 'Maximum cycle count is 60 minutes',
+            },
+          }}
         />
-
-        {errors.length !== 0 && <ErrorMessage error={errors.join('\n')} />}
 
         <Pressable
           style={({ pressed }) => [
@@ -131,8 +165,8 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
             },
             styles.save,
           ]}
-          disabled={errors.length !== 0 || saving}
-          onPress={onSave}>
+          disabled={saving}
+          onPress={handleSubmit(onSave)}>
           <Text style={[{ color: theme.colors.onPrimary }, styles.saveText]}>
             Save changes
           </Text>

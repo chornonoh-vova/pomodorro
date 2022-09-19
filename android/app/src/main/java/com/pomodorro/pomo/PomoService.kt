@@ -6,7 +6,6 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import androidx.core.app.NotificationManagerCompat
-import androidx.preference.PreferenceManager
 import com.pomodorro.BuildConfig
 import com.pomodorro.R
 import com.pomodorro.notifications.NotificationHelper
@@ -18,9 +17,7 @@ import java.util.UUID
 class PomoService : Service() {
   private var observer: PomoObserver? = null
 
-  private val settings by lazy {
-    Settings(PreferenceManager.getDefaultSharedPreferences(this))
-  }
+  private val settings = Settings()
 
   private var pomoActiveId = UUID.randomUUID().hashCode()
   private var pomoCurrentId = UUID.randomUUID().hashCode()
@@ -132,12 +129,12 @@ class PomoService : Service() {
       setContentText(getPomoActiveText())
 
       if (isTimerRunning()) {
-        addAction(R.drawable.ic_baseline_pause_24, "Pause", buildPendingAction(ACTION_PAUSE))
+        addAction(R.drawable.pause, "Pause", buildPendingAction(ACTION_PAUSE))
       } else {
-        addAction(R.drawable.ic_baseline_play_arrow_24, "Continue", buildPendingAction(ACTION_PLAY))
+        addAction(R.drawable.play, "Continue", buildPendingAction(ACTION_PLAY))
       }
 
-      addAction(R.drawable.ic_baseline_stop_24, "Stop", buildPendingAction(ACTION_STOP))
+      addAction(R.drawable.stop, "Stop", buildPendingAction(ACTION_STOP))
 
       build()
     }

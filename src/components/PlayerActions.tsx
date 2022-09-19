@@ -3,10 +3,10 @@ import { View, StyleSheet, Pressable } from 'react-native';
 
 import { useTheme } from '../hooks/useTheme';
 
-import IconPlayerPause from '../assets/icons/player-pause.svg';
-import IconPlayerPlay from '../assets/icons/player-play.svg';
-import IconRotate from '../assets/icons/rotate.svg';
-import IconPlayerStop from '../assets/icons/player-stop.svg';
+import PauseIcon from '../assets/icons/pause.svg';
+import PlayIcon from '../assets/icons/play.svg';
+import RestartIcon from '../assets/icons/restart.svg';
+import StopIcon from '../assets/icons/stop.svg';
 
 type PlayerActionsProps = {
   playing: boolean;
@@ -37,7 +37,7 @@ const PlayerActions = ({
           styles.sideButton,
         ]}
         onPress={onReset}>
-        <IconRotate color={theme.colors.onPrimary} width={48} height={48} />
+        <RestartIcon color={theme.colors.onPrimary} width={48} height={48} />
       </Pressable>
 
       <Pressable
@@ -51,17 +51,9 @@ const PlayerActions = ({
         ]}
         onPress={playing ? onPause : onPlay}>
         {playing ? (
-          <IconPlayerPause
-            color={theme.colors.onPrimary}
-            width={64}
-            height={64}
-          />
+          <PauseIcon color={theme.colors.onPrimary} width={64} height={64} />
         ) : (
-          <IconPlayerPlay
-            color={theme.colors.onPrimary}
-            width={64}
-            height={64}
-          />
+          <PlayIcon color={theme.colors.onPrimary} width={64} height={64} />
         )}
       </Pressable>
 
@@ -75,7 +67,7 @@ const PlayerActions = ({
           styles.sideButton,
         ]}
         onPress={onStop}>
-        <IconPlayerStop color={theme.colors.onPrimary} width={48} height={48} />
+        <StopIcon color={theme.colors.onPrimary} width={48} height={48} />
       </Pressable>
     </View>
   );

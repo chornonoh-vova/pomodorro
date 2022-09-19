@@ -1,17 +1,34 @@
 import React from 'react';
+import {
+  FieldValues,
+  FieldPath,
+  UseControllerProps,
+  useController,
+} from 'react-hook-form';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 
 import { useTheme } from '../hooks/useTheme';
 
-type SwitcherProps = {
+const Switcher = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  control,
+  title,
+  subtitle,
+  ...props
+}: UseControllerProps<TFieldValues, TName> & {
   title: string;
   subtitle?: string;
-  value: boolean;
-  onChange: (value: boolean) => void;
-};
-
-const Switcher = ({ title, subtitle, value, onChange }: SwitcherProps) => {
+}) => {
   const theme = useTheme();
+
+  const {
+    field: { ref, value, onChange },
+  } = useController<TFieldValues, TName>({
+    control,
+    ...props,
+  });
 
   return (
     <View style={styles.switcherWrapper}>
@@ -25,7 +42,7 @@ const Switcher = ({ title, subtitle, value, onChange }: SwitcherProps) => {
         </Text>
       </View>
 
-      <Switch value={value} onValueChange={onChange} />
+      <Switch ref={ref} value={value} onValueChange={onChange} />
     </View>
   );
 };
