@@ -26,7 +26,7 @@ type SettingsFormData = {
   cycleCount: number;
 };
 
-const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
+export default function SettingsScreen({ navigation }: SettingsScreenProps) {
   const theme = useTheme();
 
   const [saving, setSaving] = useState(false);
@@ -42,12 +42,7 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
   });
 
   useEffect(() => {
-    const start = new Date().getUTCMilliseconds();
-
     SettingsModule.getAll().then((settings) => {
-      const end = new Date().getUTCMilliseconds();
-      console.log('get all settings:', end - start);
-
       setValue('autoStart', settings.autoStart);
       setValue('focusDuration', settings.focusDuration / 60);
       setValue('shortBreakDuration', settings.shortBreakDuration / 60);
@@ -174,14 +169,15 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
       </ScrollView>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'stretch',
     justifyContent: 'flex-start',
-    marginVertical: 16,
+    marginTop: 16,
+    marginBottom: 48,
   },
 
   scrollView: {
@@ -200,5 +196,3 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
-
-export default SettingsScreen;

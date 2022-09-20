@@ -201,6 +201,10 @@ android {
         }
       }
     }
+    packagingOptions {
+      pickFirst '**/libhermes.so'
+      pickFirst '**/libjsc.so'
+    }
   }
 
   splits {
@@ -250,8 +254,7 @@ android {
 dependencies {
   implementation(fileTree(dir: "libs", include: ["*.jar"]))
 
-  //noinspection GradleDynamicVersion
-  implementation("com.facebook.react:react-native:+")  // From node_modules
+  implementation project(":ReactAndroid")  // From node_modules
 
   implementation("com.tencent:mmkv:1.2.14")
   implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.10")

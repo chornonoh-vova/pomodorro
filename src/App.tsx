@@ -6,11 +6,16 @@ import MainScreen from './screens/Main';
 import AboutScreen from './screens/About';
 import SettingsScreen from './screens/Settings';
 
+import HeaderButton from './components/HeaderButton';
+
 import { useTheme } from './hooks/useTheme';
 
 import { RootStackParamList } from './navigation';
 
 import { name as appName } from '../app.json';
+
+import InfoIcon from './assets/icons/info.svg';
+import SettingsIcon from './assets/icons/settings.svg';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -31,7 +36,27 @@ const App = () => {
         <RootStack.Screen
           name="Main"
           component={MainScreen}
-          options={{ title: appName }}
+          options={({ navigation }) => ({
+            title: appName,
+            headerLeft: () => {
+              return (
+                <HeaderButton onPress={() => navigation.navigate('About')}>
+                  <InfoIcon color={theme.colors.text} width={24} height={24} />
+                </HeaderButton>
+              );
+            },
+            headerRight: () => {
+              return (
+                <HeaderButton onPress={() => navigation.navigate('Settings')}>
+                  <SettingsIcon
+                    color={theme.colors.text}
+                    width={24}
+                    height={24}
+                  />
+                </HeaderButton>
+              );
+            },
+          })}
         />
 
         <RootStack.Screen

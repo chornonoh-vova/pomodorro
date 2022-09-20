@@ -7,7 +7,7 @@ import { useTheme } from '../hooks/useTheme';
 
 type AboutScreenProps = NativeStackScreenProps<RootStackParamList, 'About'>;
 
-const AboutScreen = (_props: AboutScreenProps) => {
+export default function AboutScreen(_props: AboutScreenProps) {
   const theme = useTheme();
 
   const process = [
@@ -114,11 +114,12 @@ const AboutScreen = (_props: AboutScreenProps) => {
       </ScrollView>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginBottom: 60,
   },
 
   list: {
@@ -158,5 +159,3 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
 });
-
-export default AboutScreen;

@@ -1,10 +1,9 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { PomoState } from '../types/pomo';
 
-import HeaderButton from '../components/HeaderButton';
 import PlayerActions from '../components/PlayerActions';
 import Countdown from '../components/Countdown';
 
@@ -17,12 +16,9 @@ import { useTheme } from '../hooks/useTheme';
 import { usePomoTimer } from '../hooks/usePomoTimer';
 import { Orientation, useOrientation } from '../hooks/useOrientation';
 
-import InfoIcon from '../assets/icons/info.svg';
-import IconSettings from '../assets/icons/settings.svg';
-
 type MainScreenProps = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
-const MainScreen = ({ navigation }: MainScreenProps) => {
+export default function MainScreen({ navigation }: MainScreenProps) {
   const theme = useTheme();
   const orientation = useOrientation();
 
@@ -62,25 +58,6 @@ const MainScreen = ({ navigation }: MainScreenProps) => {
     return unsubscribe;
   }, [navigation, state]);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => {
-        return (
-          <HeaderButton onPress={() => navigation.navigate('About')}>
-            <InfoIcon color={theme.colors.text} width={24} height={24} />
-          </HeaderButton>
-        );
-      },
-      headerRight: () => {
-        return (
-          <HeaderButton onPress={() => navigation.navigate('Settings')}>
-            <IconSettings color={theme.colors.text} width={24} height={24} />
-          </HeaderButton>
-        );
-      },
-    });
-  }, [navigation, theme]);
-
   return (
     <View
       style={[
@@ -107,7 +84,7 @@ const MainScreen = ({ navigation }: MainScreenProps) => {
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   root: {
@@ -133,5 +110,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-
-export default MainScreen;

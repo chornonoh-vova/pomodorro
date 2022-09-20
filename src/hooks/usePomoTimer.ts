@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { NativeEventEmitter } from 'react-native';
 
 import { PomoState } from '../types/pomo';
@@ -29,6 +29,8 @@ export const usePomoTimer = (
   cycleDuration: number,
   setCycleDuration: (val: number) => void,
 ) => {
+  const [, startTransition] = useTransition();
+
   const [running, setRunning] = useState(false);
   const [cycle, setCycle] = useState(1);
   const [second, setSecond] = useState(0);
@@ -76,16 +78,18 @@ export const usePomoTimer = (
     const eventListener = eventEmitter.addListener(
       'update',
       (event: UpdateEvent) => {
-        setRunning(event.timerRunning);
-        setCycle(event.currentCycle);
-        setCycleDuration(event.currentCycleDuration);
-        setSecond(event.currentSecond);
-        setState(event.currentState);
+        startTransition(() => {
+          setRunning(event.timerRunning);
+          setCycle(event.currentCycle);
+          setCycleDuration(event.currentCycleDuration);
+          setSecond(event.currentSecond);
+          setState(event.currentState);
+        });
       },
     );
 
     return () => eventListener.remove();
-  }, [setCycleDuration]);
+  }, [setCycleDuration, startTransition]);
 
   return {
     running,
