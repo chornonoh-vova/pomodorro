@@ -132,6 +132,8 @@ def reactNativeArchitectures() {
 }
 
 android {
+    namespace "com.pomodorro"
+
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -212,6 +214,7 @@ android {
             include (*reactNativeArchitectures())
         }
     }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -220,6 +223,7 @@ android {
             keyPassword 'android'
         }
     }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -258,7 +262,7 @@ dependencies {
 
     implementation "com.tencent:mmkv:1.2.14"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.10"
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'

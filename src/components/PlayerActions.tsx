@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 
 import { useTheme } from '../hooks/useTheme';

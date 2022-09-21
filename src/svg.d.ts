@@ -1,6 +1,6 @@
 declare module '*.svg' {
-  import React from 'react';
+  import { FunctionComponent } from 'react';
   import { SvgProps } from 'react-native-svg';
-  const content: React.FC<SvgProps>;
+  const content: FunctionComponent<SvgProps>;
   export default content;
 }

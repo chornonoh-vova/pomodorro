@@ -11,6 +11,8 @@ module.exports = {
         'no-shadow': 'off',
         'no-undef': 'off',
         'react/no-unstable-nested-components': ['warn', { allowAsProps: true }],
+        'react/jsx-uses-react': 'off',
+        'react/react-in-jsx-scope': 'off',
       },
     },
   ],

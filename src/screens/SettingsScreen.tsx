@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, ScrollView, Pressable, Text, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
