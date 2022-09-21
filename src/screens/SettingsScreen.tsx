@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, ScrollView, Pressable, Text, View } from 'react-native';
 import { useForm } from 'react-hook-form';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-
-import type { RootStackParamList } from '../navigation';
+import type { TabParamList } from '../navigation';
 
 import Switcher from '../components/Switcher';
 import NumberInput from '../components/NumberInput';
@@ -13,10 +12,7 @@ import SettingsModule from '../native/SettingsModule';
 
 import { useTheme } from '../hooks/useTheme';
 
-type SettingsScreenProps = NativeStackScreenProps<
-  RootStackParamList,
-  'Settings'
->;
+type SettingsScreenProps = BottomTabScreenProps<TabParamList, 'Settings'>;
 
 type SettingsFormData = {
   autoStart: boolean;
@@ -26,7 +22,7 @@ type SettingsFormData = {
   cycleCount: number;
 };
 
-export default function SettingsScreen({ navigation }: SettingsScreenProps) {
+const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
   const theme = useTheme();
 
   const [saving, setSaving] = useState(false);
@@ -70,8 +66,8 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
   );
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+    <ScrollView>
+      <View style={styles.container}>
         <Switcher
           control={control}
           name="autoStart"
@@ -166,22 +162,18 @@ export default function SettingsScreen({ navigation }: SettingsScreenProps) {
             Save changes
           </Text>
         </Pressable>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'stretch',
     justifyContent: 'flex-start',
-    marginTop: 16,
-    marginBottom: 48,
-  },
-
-  scrollView: {
-    paddingHorizontal: 20,
+    marginVertical: 16,
+    marginHorizontal: 20,
   },
 
   save: {
@@ -196,3 +188,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+
+export default SettingsScreen;

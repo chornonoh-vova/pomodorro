@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
 import { PomoState } from '../types/pomo';
 
@@ -10,15 +10,15 @@ import Countdown from '../components/Countdown';
 import PomoModule from '../native/PomoModule';
 import SettingsModule from '../native/SettingsModule';
 
-import { RootStackParamList } from '../navigation';
+import { TabParamList } from '../navigation';
 
 import { useTheme } from '../hooks/useTheme';
 import { usePomoTimer } from '../hooks/usePomoTimer';
 import { Orientation, useOrientation } from '../hooks/useOrientation';
 
-type MainScreenProps = NativeStackScreenProps<RootStackParamList, 'Main'>;
+type PomoScreenProps = BottomTabScreenProps<TabParamList, 'Pomo'>;
 
-export default function MainScreen({ navigation }: MainScreenProps) {
+const PomoScreen = ({ navigation }: PomoScreenProps) => {
   const theme = useTheme();
   const orientation = useOrientation();
 
@@ -59,50 +59,55 @@ export default function MainScreen({ navigation }: MainScreenProps) {
   }, [navigation, state]);
 
   return (
-    <View
-      style={[
-        styles.root,
-        styles.container,
-        orientation === Orientation.PORTRAIT
-          ? styles.containerPortrait
-          : styles.containerLandscape,
-      ]}>
-      <View style={styles.container}>
-        <Countdown time={time} percent={percent} state={state} />
+    <ScrollView>
+      <View
+        style={[
+          styles.container,
+          orientation === Orientation.PORTRAIT
+            ? styles.containerPortrait
+            : styles.containerLandscape,
+        ]}>
+        <View style={styles.countdown}>
+          <Countdown time={time} percent={percent} state={state} />
 
-        <Text style={[{ color: theme.colors.text }, styles.cycleText]}>
-          {cycle}/{cycleCount}
-        </Text>
+          <Text style={[{ color: theme.colors.text }, styles.cycleText]}>
+            {cycle}/{cycleCount}
+          </Text>
+        </View>
+
+        <PlayerActions
+          playing={running}
+          onPlay={() => PomoModule.play()}
+          onPause={() => PomoModule.pause()}
+          onStop={() => PomoModule.stop()}
+          onReset={() => PomoModule.reset()}
+        />
       </View>
-
-      <PlayerActions
-        playing={running}
-        onPlay={() => PomoModule.play()}
-        onPause={() => PomoModule.pause()}
-        onStop={() => PomoModule.stop()}
-        onReset={() => PomoModule.reset()}
-      />
-    </View>
+    </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  root: {
+  container: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
-  container: {
+  countdown: {
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   containerPortrait: {
     flexDirection: 'column',
+    marginVertical: 48,
   },
 
   containerLandscape: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    marginVertical: 16,
   },
 
   cycleText: {
@@ -110,3 +115,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+
+export default PomoScreen;

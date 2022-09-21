@@ -8,7 +8,9 @@ module.exports = {
       files: ['*.ts', '*.tsx'],
       rules: {
         '@typescript-eslint/no-shadow': ['error'],
-        'react/no-unstable-nested-components': ['off'],
+        'no-shadow': 'off',
+        'no-undef': 'off',
+        'react/no-unstable-nested-components': ['warn', { allowAsProps: true }],
       },
     },
   ],

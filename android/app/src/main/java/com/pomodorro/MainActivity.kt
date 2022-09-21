@@ -25,17 +25,13 @@ class MainActivity : ReactActivity() {
 
   class MainActivityDelegate(activity: ReactActivity?, mainComponentName: String?) :
     ReactActivityDelegate(activity, mainComponentName) {
-    override fun createRootView(): ReactRootView {
-      val reactRootView = ReactRootView(context)
-      // If you opted-in for the New Architecture, we enable the Fabric Renderer.
-      reactRootView.setIsFabric(BuildConfig.IS_NEW_ARCHITECTURE_ENABLED)
-      return reactRootView
+    // If you opted-in for the New Architecture, we enable the Fabric Renderer.
+    override fun createRootView() = ReactRootView(context).apply {
+      setIsFabric(BuildConfig.IS_NEW_ARCHITECTURE_ENABLED)
     }
 
-    override fun isConcurrentRootEnabled(): Boolean {
-      // If you opted-in for the New Architecture, we enable Concurrent Root (i.e. React 18).
-      // More on this on https://reactjs.org/blog/2022/03/29/react-v18.html
-      return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
-    }
+    // If you opted-in for the New Architecture, we enable Concurrent Root (i.e. React 18).
+    // More on this on https://reactjs.org/blog/2022/03/29/react-v18.html
+    override fun isConcurrentRootEnabled() = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
   }
 }

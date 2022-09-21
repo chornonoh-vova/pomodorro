@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { RootStackParamList } from '../navigation';
+import { StackParamList } from '../navigation';
 import { useTheme } from '../hooks/useTheme';
 
-type AboutScreenProps = NativeStackScreenProps<RootStackParamList, 'About'>;
+type AboutScreenProps = NativeStackScreenProps<StackParamList, 'About'>;
 
 export default function AboutScreen(_props: AboutScreenProps) {
   const theme = useTheme();
@@ -40,8 +40,8 @@ export default function AboutScreen(_props: AboutScreenProps) {
   ];
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+    <ScrollView>
+      <View style={styles.container}>
         <Text style={[{ color: theme.colors.text }, styles.title]}>
           What is the Pomodoro Technique?
         </Text>
@@ -111,15 +111,16 @@ export default function AboutScreen(_props: AboutScreenProps) {
           technique is all about getting your mind in the zone to finish your
           tasks.
         </Text>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginBottom: 60,
+    marginVertical: 16,
+    marginHorizontal: 20,
   },
 
   list: {
