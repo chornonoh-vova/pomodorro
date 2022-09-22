@@ -10,7 +10,7 @@ import Countdown from '../components/Countdown';
 import PomoModule from '../native/PomoModule';
 import SettingsModule from '../native/SettingsModule';
 
-import { TabParamList } from '../navigation';
+import type { TabParamList } from '../types/navigation';
 
 import { useTheme } from '../hooks/useTheme';
 import { usePomoTimer } from '../hooks/usePomoTimer';

@@ -1,15 +1,12 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-import { StackParamList } from '../navigation';
-
-import AboutScreen from './AboutScreen';
-import MainTabs from './MainTabs';
-
-import HeaderButton from '../components/HeaderButton';
-
 import { useTheme } from '../hooks/useTheme';
 
+import type { StackParamList } from '../types/navigation';
+
+import HeaderButton from '../components/HeaderButton';
 import InfoIcon from '../assets/icons/info.svg';
+import AboutScreen from './AboutScreen';
+import MainTabs from './MainTabs';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 

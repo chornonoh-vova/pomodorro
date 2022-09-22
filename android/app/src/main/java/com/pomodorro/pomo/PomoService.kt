@@ -213,8 +213,6 @@ class PomoService : Service() {
     }
 
     currentSecond = 0
-
-    pomoCurrentNotify()
   }
 
   /**
@@ -228,15 +226,19 @@ class PomoService : Service() {
       override fun run() {
         if (currentSecond < getCurrentCycleDuration()) {
           currentSecond += 1
+
+          pomoActiveNotify()
         } else {
           transitionToNextState()
 
+          pomoCurrentNotify()
+
           if (!settings.autoStart) {
             pause()
+          } else {
+            pomoActiveNotify()
           }
         }
-
-        pomoActiveNotify()
       }
     }, 0, 1000)
   }

@@ -1,5 +1,5 @@
 import { ColorValue, StyleSheet } from 'react-native';
-import Svg, { Circle, G } from 'react-native-svg';
+import { Svg, Circle, G } from 'react-native-svg';
 
 type ProgressCircleProps = {
   value: number;

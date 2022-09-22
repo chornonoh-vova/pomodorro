@@ -3,7 +3,7 @@ import { StyleSheet, ScrollView, Pressable, Text, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-import type { TabParamList } from '../navigation';
+import type { TabParamList } from '../types/navigation';
 
 import Switcher from '../components/Switcher';
 import NumberInput from '../components/NumberInput';

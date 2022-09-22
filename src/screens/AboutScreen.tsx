@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { StackParamList } from '../navigation';
+import type { StackParamList } from '../types/navigation';
 import { useTheme } from '../hooks/useTheme';
 
 type AboutScreenProps = NativeStackScreenProps<StackParamList, 'About'>;

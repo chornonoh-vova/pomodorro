@@ -1,14 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import { TabParamList } from '../navigation';
-
-import SettingsScreen from './SettingsScreen';
-import PomoScreen from './PomoScreen';
+import type { TabParamList } from '../types/navigation';
 
 import { useTheme } from '../hooks/useTheme';
 
 import TimerIcon from '../assets/icons/timer.svg';
 import SettingsIcon from '../assets/icons/settings.svg';
+import PomoScreen from './PomoScreen';
+import SettingsScreen from './SettingsScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
