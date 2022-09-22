@@ -30,7 +30,10 @@ module.exports = {
         'react/react-in-jsx-scope': 'off',
         'import/order': [
           'error',
-          { groups: ['builtin', 'external', 'parent', 'sibling', 'index'] },
+          {
+            groups: ['builtin', 'external', 'parent', 'sibling', 'index'],
+            'newlines-between': 'always',
+          },
         ],
       },
     },

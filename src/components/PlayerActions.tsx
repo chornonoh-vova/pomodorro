@@ -1,7 +1,6 @@
 import { View, StyleSheet, Pressable } from 'react-native';
 
 import { useTheme } from '../hooks/useTheme';
-
 import PauseIcon from '../assets/icons/pause.svg';
 import PlayIcon from '../assets/icons/play.svg';
 import RestartIcon from '../assets/icons/restart.svg';

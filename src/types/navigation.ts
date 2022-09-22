@@ -1,5 +1,6 @@
 export type TabParamList = {
   Pomo: undefined;
+  Stat: undefined;
   Settings: undefined;
 };
 

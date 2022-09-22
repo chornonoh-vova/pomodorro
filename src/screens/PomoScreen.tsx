@@ -3,15 +3,11 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
 import { PomoState } from '../types/pomo';
-
 import PlayerActions from '../components/PlayerActions';
 import Countdown from '../components/Countdown';
-
 import PomoModule from '../native/PomoModule';
 import SettingsModule from '../native/SettingsModule';
-
 import type { TabParamList } from '../types/navigation';
-
 import { useTheme } from '../hooks/useTheme';
 import { usePomoTimer } from '../hooks/usePomoTimer';
 import { Orientation, useOrientation } from '../hooks/useOrientation';

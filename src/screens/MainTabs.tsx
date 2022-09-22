@@ -1,13 +1,14 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import type { TabParamList } from '../types/navigation';
-
 import { useTheme } from '../hooks/useTheme';
-
 import TimerIcon from '../assets/icons/timer.svg';
+import InsightsIcon from '../assets/icons/insights.svg';
 import SettingsIcon from '../assets/icons/settings.svg';
+
 import PomoScreen from './PomoScreen';
 import SettingsScreen from './SettingsScreen';
+import StatScreen from './StatScreen';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -31,6 +32,17 @@ const MainTabs = () => {
           title: 'Pomodoro',
           tabBarIcon: ({ color, size }) => (
             <TimerIcon color={color} width={size} height={size} />
+          ),
+        }}
+      />
+
+      <Tab.Screen
+        name="Stat"
+        component={StatScreen}
+        options={{
+          title: 'Statistics',
+          tabBarIcon: ({ color, size }) => (
+            <InsightsIcon color={color} width={size} height={size} />
           ),
         }}
       />

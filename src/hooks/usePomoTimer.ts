@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import { NativeEventEmitter } from 'react-native';
 
 import { PomoState } from '../types/pomo';
-
 import PomoModule from '../native/PomoModule';
 
 const getTime = (second: number) => {

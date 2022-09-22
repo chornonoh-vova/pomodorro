@@ -7,6 +7,7 @@ import {
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useTheme } from '../hooks/useTheme';
+
 import ErrorMessage from './ErrorMessage';
 
 const NumberInput = <
