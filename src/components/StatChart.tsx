@@ -1,6 +1,5 @@
 import {
   eachDayOfInterval,
-  eachWeekOfInterval,
   endOfWeek,
   format,
   startOfWeek,
@@ -8,13 +7,14 @@ import {
   endOfMonth,
   startOfYear,
   endOfYear,
+  eachMonthOfInterval,
 } from 'date-fns';
 
+import { useTheme } from '../hooks/useTheme';
 import { Period } from '../types/stat';
 import { exhaustiveCheck } from '../types/utils';
 
-import WeekAndMonthStatChart from './WeekAndMonthStatChart';
-import YearStatChart from './YearStatChart';
+import StatBarChart from './StatBarChart';
 
 type StatChartProps = {
   width: number;
@@ -26,56 +26,48 @@ const HEIGHT = 350;
 const weekData = () => {
   const now = new Date();
 
-  const labels = eachDayOfInterval({
+  return eachDayOfInterval({
     start: startOfWeek(now),
     end: endOfWeek(now),
-  }).map((date) => format(date, 'E'));
-
-  return {
-    labels,
-    datasets: [
-      {
-        data: Array(labels.length)
-          .fill(0)
-          .map(() => +(Math.random() * 100).toFixed(0)),
-      },
-    ],
-  };
+  }).map((date) => ({
+    value: +(Math.random() * 100).toFixed(0),
+    date,
+    label: format(date, 'E'),
+    description: '',
+  }));
 };
 
 const monthData = () => {
   const now = new Date();
 
-  const labels = eachWeekOfInterval({
+  return eachDayOfInterval({
     start: startOfMonth(now),
     end: endOfMonth(now),
-  }).map((date) => format(date, 'MMM dd'));
-
-  return {
-    labels,
-    datasets: [
-      {
-        data: Array(labels.length)
-          .fill(0)
-          .map(() => +(Math.random() * 100).toFixed(0)),
-      },
-    ],
-  };
+  }).map((date, index) => ({
+    value: +(Math.random() * 100).toFixed(0),
+    date,
+    label: index === 0 || (index + 1) % 7 === 0 ? format(date, 'd') : '',
+    description: '',
+  }));
 };
 
 const yearData = () => {
   const now = new Date();
 
-  return eachDayOfInterval({
+  return eachMonthOfInterval({
     start: startOfYear(now),
     end: endOfYear(now),
   }).map((date) => ({
-    date: format(date, 'yyyy-MM-dd'),
-    count: +(Math.random() * 5).toFixed(0),
+    value: +(Math.random() * 100).toFixed(0),
+    date,
+    label: format(date, 'MMM'),
+    description: '',
   }));
 };
 
 const StatChart = ({ width, period }: StatChartProps) => {
+  const theme = useTheme();
+
   const week = weekData();
   const month = monthData();
   const year = yearData();
@@ -83,14 +75,38 @@ const StatChart = ({ width, period }: StatChartProps) => {
   switch (period) {
     case Period.WEEK:
       return (
-        <WeekAndMonthStatChart width={width} height={HEIGHT} data={week} />
+        <StatBarChart
+          width={width}
+          height={HEIGHT}
+          barColor={theme.colors.primaryDarken}
+          textColor={theme.colors.text}
+          barWidth={32}
+          barRadius={6}
+          data={week}
+        />
       );
     case Period.MONTH:
       return (
-        <WeekAndMonthStatChart width={width} height={HEIGHT} data={month} />
+        <StatBarChart
+          width={width}
+          height={HEIGHT}
+          barColor={theme.colors.primaryDarken}
+          textColor={theme.colors.text}
+          data={month}
+        />
       );
     case Period.YEAR:
-      return <YearStatChart height={HEIGHT} data={year} />;
+      return (
+        <StatBarChart
+          width={width}
+          height={HEIGHT}
+          barColor={theme.colors.primaryDarken}
+          textColor={theme.colors.text}
+          barWidth={16}
+          barRadius={4}
+          data={year}
+        />
+      );
     default:
       exhaustiveCheck(period);
   }

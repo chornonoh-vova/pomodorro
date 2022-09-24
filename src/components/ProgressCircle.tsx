@@ -30,14 +30,16 @@ const ProgressCircle = ({
       width={width}
       height={height}
       viewBox={`0 0 ${halfCircle * 2} ${halfCircle * 2}`}>
-      <G rotation="-90" origin={`${halfCircle}, ${halfCircle}`}>
+      <G
+        rotation="-90"
+        origin={`${halfCircle}, ${halfCircle}`}
+        fill="transparent"
+        stroke={color}
+        strokeWidth={strokeWidth}>
         <Circle
           cx="50%"
           cy="50%"
           r={radius}
-          fill="transparent"
-          stroke={color}
-          strokeWidth={strokeWidth}
           strokeLinejoin="round"
           strokeOpacity=".2"
         />
@@ -46,9 +48,6 @@ const ProgressCircle = ({
           cx="50%"
           cy="50%"
           r={radius}
-          fill="transparent"
-          stroke={color}
-          strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={circumference - (circumference * value) / 100}
