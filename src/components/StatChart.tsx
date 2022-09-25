@@ -10,18 +10,15 @@ import {
   eachMonthOfInterval,
 } from 'date-fns';
 
-import { useTheme } from '../hooks/useTheme';
 import { Period } from '../types/stat';
-import { exhaustiveCheck } from '../types/utils';
 
 import StatBarChart from './StatBarChart';
 
 type StatChartProps = {
   width: number;
+  height: number;
   period: Period;
 };
-
-const HEIGHT = 350;
 
 const weekData = () => {
   const now = new Date();
@@ -33,7 +30,7 @@ const weekData = () => {
     value: +(Math.random() * 100).toFixed(0),
     date,
     label: format(date, 'E'),
-    description: '',
+    description: format(date, 'MMM dd, yyyy'),
   }));
 };
 
@@ -47,7 +44,7 @@ const monthData = () => {
     value: +(Math.random() * 100).toFixed(0),
     date,
     label: index === 0 || (index + 1) % 7 === 0 ? format(date, 'd') : '',
-    description: '',
+    description: format(date, 'MMM dd, yyyy'),
   }));
 };
 
@@ -61,55 +58,44 @@ const yearData = () => {
     value: +(Math.random() * 100).toFixed(0),
     date,
     label: format(date, 'MMM'),
-    description: '',
+    description: format(date, 'MMMM yyyy'),
   }));
 };
 
-const StatChart = ({ width, period }: StatChartProps) => {
-  const theme = useTheme();
-
+const StatChart = ({ width, height, period }: StatChartProps) => {
   const week = weekData();
   const month = monthData();
   const year = yearData();
 
-  switch (period) {
-    case Period.WEEK:
-      return (
-        <StatBarChart
-          width={width}
-          height={HEIGHT}
-          barColor={theme.colors.primaryDarken}
-          textColor={theme.colors.text}
-          barWidth={32}
-          barRadius={6}
-          data={week}
-        />
-      );
-    case Period.MONTH:
-      return (
-        <StatBarChart
-          width={width}
-          height={HEIGHT}
-          barColor={theme.colors.primaryDarken}
-          textColor={theme.colors.text}
-          data={month}
-        />
-      );
-    case Period.YEAR:
-      return (
-        <StatBarChart
-          width={width}
-          height={HEIGHT}
-          barColor={theme.colors.primaryDarken}
-          textColor={theme.colors.text}
-          barWidth={16}
-          barRadius={4}
-          data={year}
-        />
-      );
-    default:
-      exhaustiveCheck(period);
+  if (period === Period.WEEK) {
+    return (
+      <StatBarChart
+        width={width}
+        height={height}
+        barWidth={32}
+        barRadius={6}
+        data={week}
+      />
+    );
   }
+
+  if (period === Period.MONTH) {
+    return <StatBarChart width={width} height={height} data={month} />;
+  }
+
+  if (period === Period.YEAR) {
+    return (
+      <StatBarChart
+        width={width}
+        height={height}
+        barWidth={16}
+        barRadius={4}
+        data={year}
+      />
+    );
+  }
+
+  return null;
 };
 
 export default StatChart;

@@ -19,7 +19,7 @@ type SettingsFormData = {
   cycleCount: number;
 };
 
-const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
+const SettingsScreen = (_props: SettingsScreenProps) => {
   const theme = useTheme();
 
   const [saving, setSaving] = useState(false);
@@ -44,23 +44,17 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
     });
   }, [setValue]);
 
-  const onSave = useCallback(
-    (data: SettingsFormData) => {
-      setSaving(true);
+  const onSave = useCallback((data: SettingsFormData) => {
+    setSaving(true);
 
-      SettingsModule.setAll({
-        autoStart: data.autoStart,
-        focusDuration: data.focusDuration * 60,
-        shortBreakDuration: data.shortBreakDuration * 60,
-        longBreakDuration: data.longBreakDuration * 60,
-        cycleCount: data.cycleCount,
-      }).then(() => {
-        setSaving(false);
-        navigation.goBack();
-      });
-    },
-    [navigation],
-  );
+    SettingsModule.setAll({
+      autoStart: data.autoStart,
+      focusDuration: data.focusDuration * 60,
+      shortBreakDuration: data.shortBreakDuration * 60,
+      longBreakDuration: data.longBreakDuration * 60,
+      cycleCount: data.cycleCount,
+    }).then(() => setSaving(false));
+  }, []);
 
   return (
     <ScrollView>

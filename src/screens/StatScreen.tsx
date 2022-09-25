@@ -38,6 +38,7 @@ const StatScreen = (_props: StatScreenProps) => {
           <StatChart
             key={`${selectedPeriod}-${width}`}
             width={width - 32}
+            height={300}
             period={selectedPeriod}
           />
         </View>

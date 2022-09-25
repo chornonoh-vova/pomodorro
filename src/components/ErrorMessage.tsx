@@ -3,8 +3,8 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import IconAlertTriangle from '../assets/icons/alert-triangle.svg';
 
-const textColor = 'rgb(176, 0, 32)';
-const backgroundColor = 'rgba(176, 0, 32, 0.25)';
+const textColor = '#b91c1c';
+const backgroundColor = '#fecaca';
 
 const ErrorMessage = ({ children }: { children: ReactNode }) => {
   return (
