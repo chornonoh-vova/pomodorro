@@ -10,8 +10,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  github-release-android:
-    name: GitHub release
+  github-android:
+    name: GitHub
 
     runs-on: ubuntu-latest
 
@@ -40,7 +40,7 @@ jobs:
       - name: Build APKs
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assembleRelease --no-daemon
+          arguments: assembleRelease
           build-root-directory: android
 
       - name: Rename APKs
@@ -67,8 +67,8 @@ jobs:
           files: |
             android/app/build/outputs/apk/release/*signed.apk
 
-  store-release-android:
-    name: Google Play Store release
+  store-android:
+    name: Play Store
 
     runs-on: ubuntu-latest
 
@@ -97,7 +97,7 @@ jobs:
       - name: Build AAB
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: bundleRelease --no-daemon
+          arguments: bundleRelease
           build-root-directory: android
 
       - name: Sign AAB
