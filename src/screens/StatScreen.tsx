@@ -1,5 +1,4 @@
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { Picker } from '@react-native-picker/picker';
 import {
   ScrollView,
   StyleSheet,
@@ -10,13 +9,12 @@ import { useState } from 'react';
 
 import type { TabParamList } from '../types/navigation';
 import { Period } from '../types/stat';
-import { useTheme } from '../hooks/useTheme';
 import StatChart from '../components/StatChart';
+import PeriodSelector from '../components/PeriodSelector';
 
 type StatScreenProps = BottomTabScreenProps<TabParamList, 'Stat'>;
 
 const StatScreen = (_props: StatScreenProps) => {
-  const theme = useTheme();
   const [selectedPeriod, setSelectedPeriod] = useState(Period.WEEK);
 
   const { width } = useWindowDimensions();
@@ -24,15 +22,15 @@ const StatScreen = (_props: StatScreenProps) => {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <View style={[{ borderColor: theme.colors.border }, styles.period]}>
-          <Picker
-            selectedValue={selectedPeriod}
-            onValueChange={(period) => setSelectedPeriod(period)}>
-            <Picker.Item label="Week" value={Period.WEEK} />
-            <Picker.Item label="Month" value={Period.MONTH} />
-            <Picker.Item label="Year" value={Period.YEAR} />
-          </Picker>
-        </View>
+        <PeriodSelector
+          periods={[
+            { value: Period.WEEK, label: 'Week' },
+            { value: Period.MONTH, label: 'Month' },
+            { value: Period.YEAR, label: 'Year' },
+          ]}
+          selectedPeriod={selectedPeriod}
+          setSelectedPeriod={setSelectedPeriod}
+        />
 
         <View style={styles.chartWrapper}>
           <StatChart
@@ -51,11 +49,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     margin: 16,
-  },
-
-  period: {
-    borderRadius: 6,
-    borderWidth: 2,
   },
 
   chartWrapper: {
