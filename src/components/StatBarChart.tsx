@@ -1,7 +1,7 @@
 import { scaleBand, scaleLinear } from 'd3-scale';
 import { useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { Svg, G, Rect, Text as SVGText } from 'react-native-svg';
+import { Svg, G, Rect, Text as SvgText } from 'react-native-svg';
 
 import { useTheme } from '../hooks/useTheme';
 
@@ -23,7 +23,10 @@ type StatBarChartProps = {
   textSize?: number;
 };
 
+const textPadding = 6;
+
 const tooltipWidth = 110;
+const tooltipLineWidth = 2;
 const tooltipHeight = 80;
 
 const StatBarChart = ({
@@ -37,7 +40,7 @@ const StatBarChart = ({
   const [selected, setSelected] = useState(-1);
   const theme = useTheme();
 
-  const textOffset = textSize + 6;
+  const textOffset = textSize + textPadding;
 
   const chartHeight = height - tooltipHeight;
 
@@ -52,14 +55,18 @@ const StatBarChart = ({
   const y = scaleLinear(yDomain, yRange);
 
   const getBarX = (date: Date) => (x(date) || 0) - barWidth / 2;
+
   const getBarHeight = (value: number) => chartHeight - y(value) - textOffset;
 
-  const getTooltipLeft = (index: number) => {
-    const raw = x(data[index].date) || 0;
+  const getTooltipLineLeft = (date: Date) =>
+    (x(date) || 0) - tooltipLineWidth / 2;
+
+  const getTooltipLeft = (date: Date) => {
+    const raw = x(date) || 0;
     const left = raw - tooltipWidth / 2;
 
     if (left < 0) {
-      return getBarX(data[index].date);
+      return getBarX(date);
     }
 
     if (left + tooltipWidth > width) {
@@ -77,17 +84,18 @@ const StatBarChart = ({
             <View
               style={[
                 {
-                  left: x(data[selected].date),
+                  left: getTooltipLineLeft(data[selected].date),
                   height: chartHeight + tooltipHeight / 2 - textOffset,
                   backgroundColor: theme.colors.surface,
                 },
                 styles.tooltipLine,
               ]}
             />
+
             <View
               style={[
                 {
-                  left: getTooltipLeft(selected),
+                  left: getTooltipLeft(data[selected].date),
                   backgroundColor: theme.colors.surface,
                 },
                 styles.tooltip,
@@ -108,7 +116,7 @@ const StatBarChart = ({
       </View>
 
       <Svg width={width} height={chartHeight} onPress={() => setSelected(-1)}>
-        <G fill={theme.colors.primary}>
+        <G>
           {data.map(({ date, value }, index) => (
             <Rect
               key={index}
@@ -118,6 +126,11 @@ const StatBarChart = ({
               height={getBarHeight(value)}
               rx={barRadius}
               ry={barRadius}
+              fill={
+                index === selected
+                  ? theme.colors.primaryDarken
+                  : theme.colors.primary
+              }
               onPress={() => setSelected(index)}
             />
           ))}
@@ -127,7 +140,7 @@ const StatBarChart = ({
           {data
             .filter(({ label }) => label)
             .map(({ date, label }, index) => (
-              <SVGText
+              <SvgText
                 key={index}
                 x={x(date)}
                 y={chartHeight}
@@ -135,7 +148,7 @@ const StatBarChart = ({
                 textAnchor="middle"
                 alignmentBaseline="text-bottom">
                 {label}
-              </SVGText>
+              </SvgText>
             ))}
         </G>
       </Svg>
@@ -159,7 +172,7 @@ const styles = StyleSheet.create({
   tooltipLine: {
     position: 'absolute',
     top: tooltipHeight / 2,
-    width: 2,
+    width: tooltipLineWidth,
   },
 
   tooltipValue: {

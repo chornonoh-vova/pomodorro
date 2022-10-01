@@ -1,16 +1,6 @@
-import {
-  eachDayOfInterval,
-  endOfWeek,
-  format,
-  startOfWeek,
-  startOfMonth,
-  endOfMonth,
-  startOfYear,
-  endOfYear,
-  eachMonthOfInterval,
-} from 'date-fns';
+import { format } from 'date-fns';
 
-import { Period } from '../types/stat';
+import { Period, StatDataPoint } from '../types/stat';
 
 import StatBarChart from './StatBarChart';
 
@@ -18,55 +8,34 @@ type StatChartProps = {
   width: number;
   height: number;
   period: Period;
+  data: StatDataPoint[];
 };
 
-const weekData = () => {
-  const now = new Date();
-
-  return eachDayOfInterval({
-    start: startOfWeek(now),
-    end: endOfWeek(now),
-  }).map((date) => ({
-    value: +(Math.random() * 100).toFixed(0),
+const getWeekData = (data: StatDataPoint[]) =>
+  data.map(({ value, date }) => ({
+    value,
     date,
     label: format(date, 'E'),
     description: format(date, 'MMM dd, yyyy'),
   }));
-};
 
-const monthData = () => {
-  const now = new Date();
-
-  return eachDayOfInterval({
-    start: startOfMonth(now),
-    end: endOfMonth(now),
-  }).map((date, index) => ({
-    value: +(Math.random() * 100).toFixed(0),
+const getMonthData = (data: StatDataPoint[]) =>
+  data.map(({ value, date }, index) => ({
+    value,
     date,
     label: index === 0 || (index + 1) % 7 === 0 ? format(date, 'd') : '',
     description: format(date, 'MMM dd, yyyy'),
   }));
-};
 
-const yearData = () => {
-  const now = new Date();
-
-  return eachMonthOfInterval({
-    start: startOfYear(now),
-    end: endOfYear(now),
-  }).map((date) => ({
-    value: +(Math.random() * 100).toFixed(0),
+const getYearData = (data: StatDataPoint[]) =>
+  data.map(({ value, date }) => ({
+    value,
     date,
     label: format(date, 'MMM'),
     description: format(date, 'MMMM yyyy'),
   }));
-};
 
-const StatChart = ({ width, height, period }: StatChartProps) => {
-  const week = weekData();
-  const month = monthData();
-  const year = yearData();
-
+const StatChart = ({ width, height, period, data }: StatChartProps) => {
   if (period === Period.WEEK) {
     return (
       <StatBarChart
@@ -74,13 +43,15 @@ const StatChart = ({ width, height, period }: StatChartProps) => {
         height={height}
         barWidth={32}
         barRadius={6}
-        data={week}
+        data={getWeekData(data)}
       />
     );
   }
 
   if (period === Period.MONTH) {
-    return <StatBarChart width={width} height={height} data={month} />;
+    return (
+      <StatBarChart width={width} height={height} data={getMonthData(data)} />
+    );
   }
 
   if (period === Period.YEAR) {
@@ -90,7 +61,7 @@ const StatChart = ({ width, height, period }: StatChartProps) => {
         height={height}
         barWidth={16}
         barRadius={4}
-        data={year}
+        data={getYearData(data)}
       />
     );
   }

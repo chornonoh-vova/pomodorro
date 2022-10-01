@@ -3,3 +3,5 @@ export const enum Period {
   MONTH = 'month',
   YEAR = 'year',
 }
+
+export type StatDataPoint = { value: number; date: Date };

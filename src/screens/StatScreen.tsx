@@ -5,10 +5,11 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { eachDayOfInterval, eachMonthOfInterval, sub } from 'date-fns';
 
 import type { TabParamList } from '../types/navigation';
-import { Period } from '../types/stat';
+import { Period, StatDataPoint } from '../types/stat';
 import StatChart from '../components/StatChart';
 import PeriodSelector from '../components/PeriodSelector';
 
@@ -16,8 +17,45 @@ type StatScreenProps = BottomTabScreenProps<TabParamList, 'Stat'>;
 
 const StatScreen = (_props: StatScreenProps) => {
   const [selectedPeriod, setSelectedPeriod] = useState(Period.WEEK);
+  const [statData, setStatData] = useState<StatDataPoint[]>([]);
 
   const { width } = useWindowDimensions();
+
+  useEffect(() => {
+    const now = new Date();
+
+    if (selectedPeriod === Period.WEEK) {
+      setStatData(
+        eachDayOfInterval({
+          start: sub(now, { weeks: 1 }),
+          end: now,
+        }).map((date) => ({
+          value: +(Math.random() * 100).toFixed(0),
+          date,
+        })),
+      );
+    } else if (selectedPeriod === Period.MONTH) {
+      setStatData(
+        eachDayOfInterval({
+          start: sub(now, { months: 1 }),
+          end: now,
+        }).map((date) => ({
+          value: +(Math.random() * 100).toFixed(0),
+          date,
+        })),
+      );
+    } else if (selectedPeriod === Period.YEAR) {
+      setStatData(
+        eachMonthOfInterval({
+          start: sub(now, { years: 1 }),
+          end: now,
+        }).map((date) => ({
+          value: +(Math.random() * 100).toFixed(0),
+          date,
+        })),
+      );
+    }
+  }, [selectedPeriod, setStatData]);
 
   return (
     <ScrollView>
@@ -38,6 +76,7 @@ const StatScreen = (_props: StatScreenProps) => {
             width={width - 32}
             height={300}
             period={selectedPeriod}
+            data={statData}
           />
         </View>
       </View>
