@@ -4,4 +4,14 @@ export const enum Period {
   YEAR = 'year',
 }
 
-export type StatDataPoint = { value: number; date: Date };
+export type StatDataPoint = {
+  value: number;
+  date: Date;
+};
+
+export type StatBarDataPoint = {
+  value: number;
+  date: Date;
+  label: string;
+  description: string;
+};
