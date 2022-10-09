@@ -4,13 +4,7 @@ import android.app.Application
 import com.facebook.react.PackageList
 import com.facebook.react.ReactNativeHost
 import com.facebook.react.ReactPackage
-import com.facebook.react.bridge.JSIModulePackage
-import com.facebook.react.bridge.JSIModuleProvider
-import com.facebook.react.bridge.JSIModuleSpec
-import com.facebook.react.bridge.JSIModuleType
-import com.facebook.react.bridge.JavaScriptContextHolder
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.UIManager
+import com.facebook.react.bridge.*
 import com.facebook.react.fabric.ComponentFactory
 import com.facebook.react.fabric.CoreComponentsRegistry
 import com.facebook.react.fabric.FabricJSIModuleProvider
@@ -21,6 +15,7 @@ import com.pomodorro.newarchitecture.components.MainComponentsRegistry
 import com.pomodorro.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate
 import com.pomodorro.pomo.PomoPackage
 import com.pomodorro.settings.SettingsPackage
+import com.pomodorro.stat.StatPackage
 
 /**
  * A [ReactNativeHost] that helps you load everything needed for the New Architecture, both
@@ -40,6 +35,8 @@ class MainApplicationReactNativeHost(application: Application?) : ReactNativeHos
     add(SettingsPackage())
     // add pomo package
     add(PomoPackage())
+    // add stat package
+    add(StatPackage())
     // TurboModules must also be loaded here providing a valid TurboReactPackage implementation:
     // add(object : TurboReactPackage() { ... });
     // If you have custom Fabric Components, their ViewManagers should also be loaded here

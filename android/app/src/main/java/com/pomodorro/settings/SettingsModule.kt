@@ -1,10 +1,6 @@
 package com.pomodorro.settings
 
-import com.facebook.react.bridge.Promise
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.*
 
 class SettingsModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {

@@ -10,9 +10,7 @@ import com.pomodorro.BuildConfig
 import com.pomodorro.R
 import com.pomodorro.notifications.NotificationHelper
 import com.pomodorro.settings.Settings
-import java.util.Timer
-import java.util.TimerTask
-import java.util.UUID
+import java.util.*
 
 class PomoService : Service() {
   private var observer: PomoObserver? = null
