@@ -1,7 +1,7 @@
 package com.pomodorro.stat
 
 import androidx.room.*
-import java.util.*
+import kotlinx.datetime.LocalDate
 
 @Dao
 interface StatDao {
@@ -12,7 +12,7 @@ interface StatDao {
   suspend fun update(statEntry: StatEntry)
 
   @Transaction
-  suspend fun insertOrUpdate(date: Date, duration: Int) {
+  suspend fun insertOrUpdate(date: LocalDate, duration: Int) {
     val entry = getOneByDate(date)
 
     if (entry == null) {
@@ -23,8 +23,8 @@ interface StatDao {
   }
 
   @Query("SELECT * FROM stat_entries WHERE date = :date")
-  suspend fun getOneByDate(date: Date): StatEntry?
+  suspend fun getOneByDate(date: LocalDate): StatEntry?
 
   @Query("SELECT * FROM stat_entries WHERE date >= :date")
-  suspend fun getAllFromDate(date: Date): List<StatEntry>
+  suspend fun getAllFromDate(date: LocalDate): List<StatEntry>
 }

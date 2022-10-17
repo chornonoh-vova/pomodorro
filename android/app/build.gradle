@@ -227,6 +227,7 @@ android {
 
     buildTypes {
         debug {
+            applicationIdSuffix ".debug"
             signingConfig signingConfigs.debug
         }
         release {
@@ -250,6 +251,10 @@ android {
 
         }
     }
+
+    packagingOptions {
+	    resources.excludes += "DebugProbesKt.bin"
+	}
 }
 
 ksp {
@@ -267,6 +272,9 @@ dependencies {
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.20"
 
+    // Datetime
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
+
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
 
@@ -276,9 +284,6 @@ dependencies {
     // Room runtime dependency
     implementation "androidx.room:room-runtime:2.4.3"
     implementation "androidx.room:room-ktx:2.4.3"
-
-    // Room annotation processing
-    annotationProcessor "androidx.room:room-compiler:2.4.3"
 
     // Room annotations with KSP
     ksp "androidx.room:room-compiler:2.4.3"

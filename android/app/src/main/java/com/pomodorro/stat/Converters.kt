@@ -1,16 +1,17 @@
 package com.pomodorro.stat
 
 import androidx.room.TypeConverter
-import java.util.*
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toLocalDate
 
 class Converters {
   @TypeConverter
-  fun fromTimestamp(value: Long?): Date? {
-    return value?.let { Date(it) }
+  fun fromDateString(value: String?): LocalDate? {
+    return value?.toLocalDate()
   }
 
   @TypeConverter
-  fun dateToTimestamp(date: Date?): Long? {
-    return date?.time
+  fun dateToDateString(date: LocalDate?): String? {
+    return date?.toString()
   }
 }

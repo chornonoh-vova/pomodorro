@@ -1,3 +1,4 @@
 <resources>
   <string name="app_name">Pomodorro</string>
+  <string name="app_name_debug">Pomodorro (Debug)</string>
 </resources>

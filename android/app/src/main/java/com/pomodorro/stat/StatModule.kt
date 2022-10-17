@@ -6,9 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.util.*
+import kotlinx.datetime.*
 
 class StatModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -17,14 +15,11 @@ class StatModule(reactContext: ReactApplicationContext) :
   private val statDao =
     AppDatabase.getInstance(reactApplicationContext.applicationContext).statDao()
 
-  private val format = SimpleDateFormat(
-    "yyyy-MM-dd",
-    Locale.getDefault(Locale.Category.FORMAT)
-  )
-
   override fun getName() = "StatModule"
 
-  private fun convert(data: List<StatEntry>) = Arguments.createArray().apply {
+  private fun today() = Clock.System.todayIn(TimeZone.currentSystemDefault())
+
+  private fun toRNArray(data: List<StatEntry>) = Arguments.createArray().apply {
     data.forEach {
       pushMap(it.toMap())
     }
@@ -33,39 +28,33 @@ class StatModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun getWeekData(promise: Promise) {
     scope.launch {
-      val weekAgo = LocalDate.now().minusWeeks(1).atStartOfDay()
+      val weekAgo = today().minus(1, DateTimeUnit.WEEK)
 
-      val date = format.parse(weekAgo.toString())
+      val data = statDao.getAllFromDate(weekAgo)
 
-      val data = statDao.getAllFromDate(date!!)
-
-      promise.resolve(convert(data))
+      promise.resolve(toRNArray(data))
     }
   }
 
   @ReactMethod
   fun getMonthData(promise: Promise) {
     scope.launch {
-      val monthAgo = LocalDate.now().minusMonths(1).atStartOfDay()
+      val monthAgo = today().minus(1, DateTimeUnit.MONTH)
 
-      val date = format.parse(monthAgo.toString())
+      val data = statDao.getAllFromDate(monthAgo)
 
-      val data = statDao.getAllFromDate(date!!)
-
-      promise.resolve(convert(data))
+      promise.resolve(toRNArray(data))
     }
   }
 
   @ReactMethod
   fun getYearData(promise: Promise) {
     scope.launch {
-      val yearAgo = LocalDate.now().minusYears(1).atStartOfDay()
+      val yearAgo = today().minus(1, DateTimeUnit.YEAR)
 
-      val date = format.parse(yearAgo.toString())
+      val data = statDao.getAllFromDate(yearAgo)
 
-      val data = statDao.getAllFromDate(date!!)
-
-      promise.resolve(convert(data))
+      promise.resolve(toRNArray(data))
     }
   }
 }
