@@ -6,16 +6,30 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import androidx.core.app.NotificationManagerCompat
+import com.pomodorro.AppDatabase
 import com.pomodorro.BuildConfig
 import com.pomodorro.R
 import com.pomodorro.notifications.NotificationHelper
 import com.pomodorro.settings.Settings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import java.util.*
 
 class PomoService : Service() {
   private var observer: PomoObserver? = null
 
   private val settings = Settings()
+
+  private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+  private val statDao by lazy {
+    AppDatabase.getInstance(applicationContext).statDao()
+  }
 
   private var pomoActiveId = UUID.randomUUID().hashCode()
   private var pomoCurrentId = UUID.randomUUID().hashCode()
@@ -80,6 +94,20 @@ class PomoService : Service() {
         currentCycle
       )
     )
+  }
+
+  private var currentStatSecond = 0
+
+  private fun recordCurrentStat() {
+    if (currentStatSecond == 0) return
+
+    scope.launch {
+      val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
+
+      statDao.insertOrUpdate(today, currentStatSecond)
+
+      currentStatSecond = 0
+    }
   }
 
   private var currentState = PomoState.FOCUS
@@ -199,6 +227,8 @@ class PomoService : Service() {
         } else {
           PomoState.LONG_BREAK
         }
+
+        recordCurrentStat()
       }
       PomoState.SHORT_BREAK -> {
         currentState = PomoState.FOCUS
@@ -225,6 +255,10 @@ class PomoService : Service() {
         if (currentSecond < getCurrentCycleDuration()) {
           currentSecond += 1
 
+          if (currentState == PomoState.FOCUS) {
+            currentStatSecond += 1
+          }
+
           pomoActiveNotify()
         } else {
           transitionToNextState()
@@ -250,6 +284,7 @@ class PomoService : Service() {
       timer = null
     }
 
+    recordCurrentStat()
     pomoActiveNotify()
   }
 
@@ -265,6 +300,7 @@ class PomoService : Service() {
     // reset current cycle second to 0
     currentSecond = 0
 
+    recordCurrentStat()
     pomoActiveNotify()
   }
 
@@ -282,6 +318,7 @@ class PomoService : Service() {
     currentSecond = 0
     currentCycle = 1
 
+    recordCurrentStat()
     pomoActiveNotify()
   }
 

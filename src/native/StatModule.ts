@@ -3,7 +3,7 @@ import { NativeModules } from 'react-native';
 const { StatModule } = NativeModules;
 
 type StatEntry = {
-  date: Date;
+  date: string;
   duration: number;
 };
 
