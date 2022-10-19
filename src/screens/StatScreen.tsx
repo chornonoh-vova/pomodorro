@@ -115,44 +115,40 @@ const barWidth = {
   [Period.YEAR]: 24,
 };
 
-const StatScreen = ({ navigation }: StatScreenProps) => {
+const StatScreen = (_props: StatScreenProps) => {
   const [selectedPeriod, setSelectedPeriod] = useState(Period.WEEK);
   const [statData, setStatData] = useState<StatBarDataPoint[]>([]);
 
   const { width } = useWindowDimensions();
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      switch (selectedPeriod) {
-        case Period.WEEK:
-          StatModule.getWeekData().then((entries) => {
-            const rawData = merge(weekPlaceholders, entries);
-            const data = rawData.map(mapStatEntries).map(mapWeekData);
-            setStatData(data);
-          });
-          break;
-        case Period.MONTH:
-          StatModule.getMonthData().then((entries) => {
-            const rawData = merge(monthPlaceholders, entries);
-            const data = rawData.map(mapStatEntries).map(mapMonthData);
-            setStatData(data);
-          });
-          break;
-        case Period.YEAR:
-          StatModule.getYearData().then((entries) => {
-            const rawData = merge(yearPlaceholders, entries);
-            const data = rawData
-              .map(mapStatEntries)
-              .reduce(reduceYearData, [] as StatDataPoint[])
-              .map(mapYearData);
-            setStatData(data);
-          });
-          break;
-      }
-    });
-
-    return unsubscribe;
-  }, [navigation, selectedPeriod, setStatData]);
+    switch (selectedPeriod) {
+      case Period.WEEK:
+        StatModule.getWeekData().then((entries) => {
+          const rawData = merge(weekPlaceholders, entries);
+          const data = rawData.map(mapStatEntries).map(mapWeekData);
+          setStatData(data);
+        });
+        break;
+      case Period.MONTH:
+        StatModule.getMonthData().then((entries) => {
+          const rawData = merge(monthPlaceholders, entries);
+          const data = rawData.map(mapStatEntries).map(mapMonthData);
+          setStatData(data);
+        });
+        break;
+      case Period.YEAR:
+        StatModule.getYearData().then((entries) => {
+          const rawData = merge(yearPlaceholders, entries);
+          const data = rawData
+            .map(mapStatEntries)
+            .reduce(reduceYearData, [] as StatDataPoint[])
+            .map(mapYearData);
+          setStatData(data);
+        });
+        break;
+    }
+  }, [selectedPeriod]);
 
   return (
     <ScrollView>
