@@ -10,12 +10,13 @@ Simple, lightweight and customizable Pomodoro timer built with React Native
 - Background service that keeps running even when activity is closed
 - Ongoing notification with countdown
 - Transition notifications that are automatically dismissed when auto start is enabled
+- Statistics tracking
 
 ## Screenshots
 
-| About screen | Main screen | Settings screen |
-|---|---|---|
-| ![screenshot of about screen](https://user-images.githubusercontent.com/26825416/188320691-d41864fc-f576-4c24-be1c-4b81b40d1ec8.jpg) | ![screenshot of main screen](https://user-images.githubusercontent.com/26825416/188320724-e1fceb6a-c5af-4516-859c-17be97122474.jpg) | ![screenshot of settings screen](https://user-images.githubusercontent.com/26825416/188320748-57f9f5e0-4378-4eea-a5d5-198c95621d8b.jpg) |
+| Main screen | Stat screen | Pref screen | About screen |
+|---|---|---|---|
+| ![main screen](./media/main_screen.jpg) | ![statistics screen](./media/stat_screen.jpg) | ![settings screen](./media/settings_screen.jpg) | ![about screen](./media/about_screen.jpg) |
 
 
 ## Requirements
