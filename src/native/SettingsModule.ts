@@ -1,14 +1,8 @@
 import { NativeModules } from 'react-native';
 
-const { SettingsModule } = NativeModules;
+import { Settings } from '../types/settings';
 
-type Settings = {
-  autoStart: boolean;
-  focusDuration: number;
-  shortBreakDuration: number;
-  longBreakDuration: number;
-  cycleCount: number;
-};
+const { SettingsModule } = NativeModules;
 
 interface SettingsModuleInterface {
   /**

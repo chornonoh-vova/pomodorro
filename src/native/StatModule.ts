@@ -1,11 +1,8 @@
 import { NativeModules } from 'react-native';
 
-const { StatModule } = NativeModules;
+import { StatEntry } from '../types/stat';
 
-type StatEntry = {
-  date: string;
-  duration: number;
-};
+const { StatModule } = NativeModules;
 
 interface StatModuleInterface {
   /**

@@ -4,6 +4,11 @@ export const enum Period {
   YEAR = 'year',
 }
 
+export type StatEntry = {
+  date: string;
+  duration: number;
+};
+
 export type StatDataPoint = {
   value: number;
   date: Date;

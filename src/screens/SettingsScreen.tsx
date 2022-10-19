@@ -19,7 +19,7 @@ type SettingsFormData = {
   cycleCount: number;
 };
 
-const SettingsScreen = (_props: SettingsScreenProps) => {
+const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
   const theme = useTheme();
 
   const [saving, setSaving] = useState(false);
@@ -35,14 +35,18 @@ const SettingsScreen = (_props: SettingsScreenProps) => {
   });
 
   useEffect(() => {
-    SettingsModule.getAll().then((settings) => {
-      setValue('autoStart', settings.autoStart);
-      setValue('focusDuration', settings.focusDuration / 60);
-      setValue('shortBreakDuration', settings.shortBreakDuration / 60);
-      setValue('longBreakDuration', settings.longBreakDuration / 60);
-      setValue('cycleCount', settings.cycleCount);
+    const unsubscribe = navigation.addListener('focus', () => {
+      SettingsModule.getAll().then((settings) => {
+        setValue('autoStart', settings.autoStart);
+        setValue('focusDuration', settings.focusDuration / 60);
+        setValue('shortBreakDuration', settings.shortBreakDuration / 60);
+        setValue('longBreakDuration', settings.longBreakDuration / 60);
+        setValue('cycleCount', settings.cycleCount);
+      });
     });
-  }, [setValue]);
+
+    return unsubscribe;
+  }, [navigation, setValue]);
 
   const onSave = useCallback((data: SettingsFormData) => {
     setSaving(true);
