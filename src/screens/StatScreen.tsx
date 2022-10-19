@@ -177,7 +177,9 @@ const StatScreen = ({ navigation }: StatScreenProps) => {
           />
         </View>
 
-        <StatSummaryCard period={selectedPeriod} data={statData} />
+        {statData.length !== 0 && (
+          <StatSummaryCard period={selectedPeriod} data={statData} />
+        )}
       </View>
     </ScrollView>
   );
