@@ -117,6 +117,7 @@ const barWidth = {
 
 const StatScreen = (_props: StatScreenProps) => {
   const [selectedPeriod, setSelectedPeriod] = useState(Period.WEEK);
+  const [statEntries, setStatEntries] = useState<StatEntry[]>([]);
   const [statData, setStatData] = useState<StatBarDataPoint[]>([]);
 
   const { width } = useWindowDimensions();
@@ -127,6 +128,7 @@ const StatScreen = (_props: StatScreenProps) => {
         StatModule.getWeekData().then((entries) => {
           const rawData = merge(weekPlaceholders, entries);
           const data = rawData.map(mapStatEntries).map(mapWeekData);
+          setStatEntries(entries);
           setStatData(data);
         });
         break;
@@ -134,6 +136,7 @@ const StatScreen = (_props: StatScreenProps) => {
         StatModule.getMonthData().then((entries) => {
           const rawData = merge(monthPlaceholders, entries);
           const data = rawData.map(mapStatEntries).map(mapMonthData);
+          setStatEntries(entries);
           setStatData(data);
         });
         break;
@@ -144,6 +147,7 @@ const StatScreen = (_props: StatScreenProps) => {
             .map(mapStatEntries)
             .reduce(reduceYearData, [] as StatDataPoint[])
             .map(mapYearData);
+          setStatEntries(entries);
           setStatData(data);
         });
         break;
@@ -174,7 +178,7 @@ const StatScreen = (_props: StatScreenProps) => {
         </View>
 
         {statData.length !== 0 && (
-          <StatSummaryCard period={selectedPeriod} data={statData} />
+          <StatSummaryCard period={selectedPeriod} data={statEntries} />
         )}
       </View>
     </ScrollView>

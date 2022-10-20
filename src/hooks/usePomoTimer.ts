@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NativeEventEmitter } from 'react-native';
 
 import { PomoState } from '../types/pomo';
@@ -28,8 +28,6 @@ export const usePomoTimer = (
   cycleDuration: number,
   setCycleDuration: (val: number) => void,
 ) => {
-  const [, startTransition] = useTransition();
-
   const [running, setRunning] = useState(false);
   const [cycle, setCycle] = useState(1);
   const [second, setSecond] = useState(0);
@@ -46,28 +44,26 @@ export const usePomoTimer = (
   );
 
   useEffect(() => {
-    const setup = async () => {
-      const serviceRunning = await PomoModule.isServiceRunning();
+    const setup = () => PomoModule.bind();
 
-      if (serviceRunning) {
-        await PomoModule.bind();
-      }
-    };
+    const teardown = () => PomoModule.unbind();
 
-    const teardown = async () => {
-      const serviceRunning = await PomoModule.isServiceRunning();
-
-      if (serviceRunning) {
-        await PomoModule.unbind();
-      }
-    };
-
-    setup().catch((reason) => console.error('bind setup error:', reason));
+    setup()
+      .then((result) => {
+        console.info('Bind setup result:', result);
+      })
+      .catch((reason) => {
+        console.error('Bind setup error:', reason);
+      });
 
     return () => {
-      teardown().catch((reason) =>
-        console.error('bind teardown error:', reason),
-      );
+      teardown()
+        .then((result) => {
+          console.info('Bind teardown result:', result);
+        })
+        .catch((reason) => {
+          console.error('Bind teardown error:', reason);
+        });
     };
   }, []);
 
@@ -77,18 +73,16 @@ export const usePomoTimer = (
     const eventListener = eventEmitter.addListener(
       'update',
       (event: UpdateEvent) => {
-        startTransition(() => {
-          setRunning(event.timerRunning);
-          setCycle(event.currentCycle);
-          setCycleDuration(event.currentCycleDuration);
-          setSecond(event.currentSecond);
-          setState(event.currentState);
-        });
+        setRunning(event.timerRunning);
+        setCycle(event.currentCycle);
+        setCycleDuration(event.currentCycleDuration);
+        setSecond(event.currentSecond);
+        setState(event.currentState);
       },
     );
 
     return () => eventListener.remove();
-  }, [setCycleDuration, startTransition]);
+  }, [setCycleDuration]);
 
   return {
     running,

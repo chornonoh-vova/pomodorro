@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 import { useTheme } from '../hooks/useTheme';
-import { Period, StatDataPoint } from '../types/stat';
+import { Period, StatEntry } from '../types/stat';
 import VisibilityIcon from '../assets/icons/visibility.svg';
 
 type StatSummaryCardProps = {
   period: Period;
-  data: StatDataPoint[];
+  data: StatEntry[];
 };
 
 const StatSummaryCard = ({ period, data }: StatSummaryCardProps) => {
@@ -32,7 +32,7 @@ const StatSummaryCard = ({ period, data }: StatSummaryCardProps) => {
   }, [period]);
 
   const sum = useMemo(
-    () => data.reduce((prev, curr) => prev + curr.value, 0),
+    () => data.reduce((prev, curr) => prev + curr.duration / 60, 0),
     [data],
   );
 
