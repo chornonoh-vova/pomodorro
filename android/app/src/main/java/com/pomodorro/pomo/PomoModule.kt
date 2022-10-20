@@ -3,7 +3,6 @@ package com.pomodorro.pomo
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Build
 import android.os.IBinder
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule
@@ -54,9 +53,15 @@ class PomoModule(reactContext: ReactApplicationContext) :
     /**
      * Remove one observer from list of RN observers
      */
-    fun removeObserver() {
-      if (observers.isNotEmpty()) {
-        observers.removeAt(observers.lastIndex)
+    fun removeObserver(count: Int) {
+      var i = count
+
+      while (i > 0) {
+        if (observers.isNotEmpty()) {
+          observers.removeAt(observers.lastIndex)
+        }
+
+        i--
       }
     }
 
@@ -94,8 +99,8 @@ class PomoModule(reactContext: ReactApplicationContext) :
    * Exposes function to remove event listener to RN side
    */
   @ReactMethod
-  fun removeListeners(@Suppress("UNUSED_PARAMETER") count: Int) {
-    observer.removeObserver()
+  fun removeListeners(count: Int) {
+    observer.removeObserver(count)
   }
 
   /**
@@ -117,6 +122,8 @@ class PomoModule(reactContext: ReactApplicationContext) :
    */
   @ReactMethod
   fun bind(promise: Promise) {
+    if (!isPomoServiceRunning()) return
+
     val context = reactApplicationContext
 
     val intent = Intent(context, PomoService::class.java)
@@ -129,6 +136,8 @@ class PomoModule(reactContext: ReactApplicationContext) :
    */
   @ReactMethod
   fun unbind(promise: Promise) {
+    if (!isPomoServiceRunning()) return
+
     val context = reactApplicationContext
 
     context.unbindService(connection)
@@ -150,13 +159,11 @@ class PomoModule(reactContext: ReactApplicationContext) :
     val intent = Intent(context, PomoService::class.java)
 
     if (!isPomoServiceRunning()) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        context.startForegroundService(intent)
-      } else {
-        context.startService(intent)
-      }
-    } else {
+      context.startForegroundService(intent)
+    } else if (bound) {
       service.play()
+    } else {
+      return
     }
 
     context.bindService(intent, connection, 0)
@@ -169,7 +176,7 @@ class PomoModule(reactContext: ReactApplicationContext) :
    */
   @ReactMethod
   fun pause(promise: Promise) {
-    if (!bound) return
+    if (!isPomoServiceRunning() || !bound) return
 
     service.pause()
 
@@ -181,7 +188,7 @@ class PomoModule(reactContext: ReactApplicationContext) :
    */
   @ReactMethod
   fun stop(promise: Promise) {
-    if (!bound) return
+    if (!isPomoServiceRunning() || !bound) return
 
     service.stop()
 
@@ -189,10 +196,16 @@ class PomoModule(reactContext: ReactApplicationContext) :
   }
 
   /**
-   * Exposes function to reset timer. PomoService will be stopped and connection will be unbound.
+   * Exposes function to reset timer.
+   *
+   * If service not running - noop
+   *
+   * If service is running - PomoService will be stopped and connection will be unbound.
    */
   @ReactMethod
   fun reset(promise: Promise) {
+    if (!isPomoServiceRunning() || !bound) return
+
     val context = reactApplicationContext
 
     val intent = Intent(context, PomoService::class.java)
