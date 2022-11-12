@@ -19,6 +19,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
 import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 class PomoService : Service() {
   private var observer: PomoObserver? = null
@@ -34,9 +35,7 @@ class PomoService : Service() {
   private var pomoActiveId = UUID.randomUUID().hashCode()
   private var pomoCurrentId = UUID.randomUUID().hashCode()
 
-  private var timer: Timer? = null
-
-  private fun isTimerRunning() = timer != null
+  private val timer = FlowTimer(scope, 1.seconds)
 
   private val binder = PomoBinder()
 
@@ -87,9 +86,9 @@ class PomoService : Service() {
   fun notifyUpdate() {
     observer?.update(
       PomoData(
-        isTimerRunning(),
+        timer.isRunning(),
         currentState,
-        currentSecond,
+        timer.currentSecond,
         getCurrentCycleDuration(),
         currentCycle
       )
@@ -111,7 +110,6 @@ class PomoService : Service() {
   }
 
   private var currentState = PomoState.FOCUS
-  private var currentSecond = 0
   private var currentCycle = 1
 
   private fun getCurrentCycleDuration(): Int {
@@ -127,7 +125,7 @@ class PomoService : Service() {
   }
 
   private fun getPomoActiveText(): String {
-    val second = getCurrentCycleDuration() - currentSecond
+    val second = getCurrentCycleDuration() - timer.currentSecond
 
     val min = (second / 60).toString().padStart(2, '0')
     val sec = (second % 60).toString().padStart(2, '0')
@@ -154,7 +152,7 @@ class PomoService : Service() {
       setContentTitle(getPomoActiveTitle())
       setContentText(getPomoActiveText())
 
-      if (isTimerRunning()) {
+      if (timer.isRunning()) {
         addAction(R.drawable.pause, "Pause", buildPendingAction(ACTION_PAUSE))
       } else {
         addAction(R.drawable.play, "Continue", buildPendingAction(ACTION_PLAY))
@@ -240,49 +238,39 @@ class PomoService : Service() {
       }
     }
 
-    currentSecond = 0
+    timer.currentSecond = 0
   }
 
   /**
    * Create timer and schedule every second update of state
    */
   fun play() {
-    if (isTimerRunning()) return
+    timer.play { currentSecond ->
+      if (currentSecond < getCurrentCycleDuration()) {
+        if (currentState == PomoState.FOCUS) {
+          currentStatSecond += 1
+        }
 
-    timer = Timer()
-    timer?.scheduleAtFixedRate(object : TimerTask() {
-      override fun run() {
-        if (currentSecond < getCurrentCycleDuration()) {
-          currentSecond += 1
+        pomoActiveNotify()
+      } else {
+        transitionToNextState()
 
-          if (currentState == PomoState.FOCUS) {
-            currentStatSecond += 1
-          }
+        pomoCurrentNotify()
 
-          pomoActiveNotify()
+        if (!settings.autoStart) {
+          pause()
         } else {
-          transitionToNextState()
-
-          pomoCurrentNotify()
-
-          if (!settings.autoStart) {
-            pause()
-          } else {
-            pomoActiveNotify()
-          }
+          pomoActiveNotify()
         }
       }
-    }, 0, 1000)
+    }
   }
 
   /**
    * Cancel running timer
    */
   fun pause() {
-    if (isTimerRunning()) {
-      timer?.cancel()
-      timer = null
-    }
+    timer.pause()
 
     recordCurrentStat()
     pomoActiveNotify()
@@ -292,13 +280,7 @@ class PomoService : Service() {
    * Cancel running timer but reset current cycle second to 0
    */
   fun stop() {
-    if (isTimerRunning()) {
-      timer?.cancel()
-      timer = null
-    }
-
-    // reset current cycle second to 0
-    currentSecond = 0
+    timer.stop()
 
     recordCurrentStat()
     pomoActiveNotify()
@@ -308,14 +290,10 @@ class PomoService : Service() {
    * Reset timer to initial state
    */
   private fun reset() {
-    if (isTimerRunning()) {
-      timer?.cancel()
-      timer = null
-    }
+    timer.stop()
 
     // reset everything to start values
     currentState = PomoState.FOCUS
-    currentSecond = 0
     currentCycle = 1
 
     recordCurrentStat()

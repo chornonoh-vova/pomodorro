@@ -40,7 +40,7 @@ const StatBarChart = ({
 
   const x = scaleBand(xDomain, xRange).padding(1);
 
-  const yDomain = [0, Math.max(...data.map(({ value }) => value))];
+  const yDomain = [0, Math.max(...data.map(({ value }) => value)) || 100];
   const yRange = [height - labelOffset, 0];
 
   const y = scaleLinear(yDomain, yRange);

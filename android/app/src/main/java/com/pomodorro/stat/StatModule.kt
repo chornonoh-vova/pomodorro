@@ -25,14 +25,64 @@ class StatModule(reactContext: ReactApplicationContext) :
     }
   }
 
+  private fun everyDayData(start: LocalDate, end: LocalDate, data: List<StatEntry>): List<StatEntry> {
+    val mutableData = data.toMutableList()
+    val result = mutableListOf<StatEntry>()
+
+    for (day in 0 .. start.daysUntil(end)) {
+      val date = start.plus(day, DateTimeUnit.DAY)
+
+      val found = mutableData.find {
+        it.date.dayOfYear == date.dayOfYear
+      }
+
+      if (found != null) {
+        result.add(found)
+
+        mutableData.remove(found)
+      } else {
+        result.add(StatEntry(date, 0))
+      }
+    }
+
+    return result
+  }
+
+  private fun everyMonthData(start: LocalDate, data: List<StatEntry>): List<StatEntry> {
+    val mutableData = data.toMutableList()
+    val result = mutableListOf<StatEntry>()
+
+    for (month in 0 .. 12) {
+      val date = start.plus(month, DateTimeUnit.MONTH)
+
+      val foundInMonth = mutableData.filter {
+        it.date.month === date.month && it.date.year == date.year
+      }
+
+      var duration = 0
+
+      foundInMonth.forEach {
+        duration += it.duration
+
+        mutableData.remove(it)
+      }
+
+      result.add(StatEntry(date, duration))
+    }
+
+    return result
+  }
+
   @ReactMethod
   fun getWeekData(promise: Promise) {
     scope.launch {
       val weekAgo = today().minus(1, DateTimeUnit.WEEK)
 
-      val data = statDao.getAllFromDate(weekAgo)
+      val recordedData = statDao.getAllFromDate(weekAgo)
 
-      promise.resolve(toRNArray(data))
+      val wholeWeekData = everyDayData(weekAgo, today(), recordedData)
+
+      promise.resolve(toRNArray(wholeWeekData))
     }
   }
 
@@ -41,9 +91,11 @@ class StatModule(reactContext: ReactApplicationContext) :
     scope.launch {
       val monthAgo = today().minus(1, DateTimeUnit.MONTH)
 
-      val data = statDao.getAllFromDate(monthAgo)
+      val recordedData = statDao.getAllFromDate(monthAgo)
 
-      promise.resolve(toRNArray(data))
+      val wholeMonthData = everyDayData(monthAgo, today(), recordedData)
+
+      promise.resolve(toRNArray(wholeMonthData))
     }
   }
 
@@ -52,9 +104,11 @@ class StatModule(reactContext: ReactApplicationContext) :
     scope.launch {
       val yearAgo = today().minus(1, DateTimeUnit.YEAR)
 
-      val data = statDao.getAllFromDate(yearAgo)
+      val recordedData = statDao.getAllFromDate(yearAgo)
 
-      promise.resolve(toRNArray(data))
+      val monthByMonthData = everyMonthData(yearAgo, recordedData)
+
+      promise.resolve(toRNArray(monthByMonthData))
     }
   }
 }

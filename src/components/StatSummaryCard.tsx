@@ -36,9 +36,14 @@ const StatSummaryCard = ({ period, data }: StatSummaryCardProps) => {
     [data],
   );
 
-  const total = useMemo(() => sum.toFixed(2), [sum]);
+  const length = useMemo(
+    () => data.filter((entry) => entry.duration !== 0).length || 1,
+    [data],
+  );
 
-  const avg = useMemo(() => (sum / data.length).toFixed(2), [data, sum]);
+  const total = sum.toFixed(2);
+
+  const avg = (sum / length).toFixed(2);
 
   return (
     <View

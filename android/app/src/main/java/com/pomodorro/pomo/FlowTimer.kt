@@ -1,0 +1,52 @@
+package com.pomodorro.pomo
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlin.time.Duration
+
+class FlowTimer(private val scope: CoroutineScope, private val period: Duration) {
+  private fun tickerFlow(): Flow<Int> = flow {
+    // immediately emit current second right after starting
+    emit(currentSecond)
+
+    while (true) {
+      delay(period)
+      currentSecond++
+      emit(currentSecond)
+    }
+  }
+
+  private lateinit var job: Job
+
+  var currentSecond = 0
+
+  fun isRunning() = this::job.isInitialized && !job.isCancelled
+
+  fun play(collector: FlowCollector<Int>) {
+    if (isRunning()) return
+
+    job = scope.launch {
+      tickerFlow().cancellable().collect(collector)
+    }
+  }
+
+  fun pause() {
+    if (!isRunning()) return
+
+    job.cancel()
+  }
+
+  fun stop() {
+    if (!isRunning()) return
+
+    job.cancel()
+
+    currentSecond = 0
+  }
+}
