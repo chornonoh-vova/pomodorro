@@ -1,4 +1,12 @@
+import { useEffect } from 'react';
 import { ColorValue, StyleSheet } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedProps,
+  useDerivedValue,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { Svg, Circle, G } from 'react-native-svg';
 
 type ProgressCircleProps = {
@@ -13,6 +21,8 @@ type ProgressCircleProps = {
   strokeWidth?: number;
 };
 
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+
 const ProgressCircle = ({
   value,
   width,
@@ -23,6 +33,24 @@ const ProgressCircle = ({
 }: ProgressCircleProps) => {
   const circumference = 2 * Math.PI * radius;
   const halfCircle = radius + strokeWidth;
+
+  const progress = useSharedValue(0);
+
+  const strokeDashoffset = useDerivedValue(() => {
+    return circumference - (circumference * progress.value) / 100;
+  });
+
+  const animatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: strokeDashoffset.value,
+  }));
+
+  useEffect(() => {
+    progress.value = withTiming(value, {
+      duration: 1000,
+      easing: Easing.out(Easing.exp),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   return (
     <Svg
@@ -41,10 +69,11 @@ const ProgressCircle = ({
           cy="50%"
           r={radius}
           strokeLinejoin="round"
-          strokeOpacity=".2"
+          strokeOpacity={0.2}
         />
 
-        <Circle
+        <AnimatedCircle
+          animatedProps={animatedProps}
           cx="50%"
           cy="50%"
           r={radius}

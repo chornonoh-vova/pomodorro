@@ -62,15 +62,20 @@ const StatScreen = (_props: StatScreenProps) => {
   const [statEntries, setStatEntries] = useState<StatEntry[]>([]);
   const [statData, setStatData] = useState<StatBarDataPoint[]>([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const { width } = useWindowDimensions();
 
   useEffect(() => {
+    setIsLoading(true);
+
     switch (selectedPeriod) {
       case Period.WEEK:
         StatModule.getWeekData().then((entries) => {
           const data = entries.map(mapStatEntries).map(mapWeekData);
           setStatEntries(entries);
           setStatData(data);
+          setIsLoading(false);
         });
         break;
       case Period.MONTH:
@@ -78,6 +83,7 @@ const StatScreen = (_props: StatScreenProps) => {
           const data = entries.map(mapStatEntries).map(mapMonthData);
           setStatEntries(entries);
           setStatData(data);
+          setIsLoading(false);
         });
         break;
       case Period.YEAR:
@@ -85,6 +91,7 @@ const StatScreen = (_props: StatScreenProps) => {
           const data = entries.map(mapStatEntries).map(mapYearData);
           setStatEntries(entries);
           setStatData(data);
+          setIsLoading(false);
         });
         break;
     }
@@ -103,18 +110,22 @@ const StatScreen = (_props: StatScreenProps) => {
           setSelectedPeriod={setSelectedPeriod}
         />
 
-        <View style={styles.chartWrapper}>
-          <StatChart
-            key={`${selectedPeriod}-${width}`}
-            width={width - 32}
-            height={300}
-            barWidth={barWidth[selectedPeriod]}
-            data={statData}
-          />
-        </View>
+        {!isLoading && (
+          <>
+            <View style={styles.chartWrapper}>
+              <StatChart
+                key={`${selectedPeriod}-${width}`}
+                width={width - 32}
+                height={300}
+                barWidth={barWidth[selectedPeriod]}
+                data={statData}
+              />
+            </View>
 
-        {statData.length !== 0 && (
-          <StatSummaryCard period={selectedPeriod} data={statEntries} />
+            {statData.length !== 0 && (
+              <StatSummaryCard period={selectedPeriod} data={statEntries} />
+            )}
+          </>
         )}
       </View>
     </ScrollView>

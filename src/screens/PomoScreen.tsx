@@ -56,29 +56,31 @@ const PomoScreen = ({ navigation }: PomoScreenProps) => {
 
   return (
     <ScrollView>
-      <View
-        style={[
-          styles.container,
-          orientation === Orientation.PORTRAIT
-            ? styles.containerPortrait
-            : styles.containerLandscape,
-        ]}>
-        <View style={styles.countdown}>
-          <Countdown time={time} percent={percent} state={state} />
+      {cycleDuration !== 0 && (
+        <View
+          style={[
+            styles.container,
+            orientation === Orientation.PORTRAIT
+              ? styles.containerPortrait
+              : styles.containerLandscape,
+          ]}>
+          <View style={styles.countdown}>
+            <Countdown time={time} percent={percent} state={state} />
 
-          <Text style={[{ color: theme.colors.text }, styles.cycleText]}>
-            {cycle}/{cycleCount}
-          </Text>
+            <Text style={[{ color: theme.colors.text }, styles.cycleText]}>
+              {cycle}/{cycleCount}
+            </Text>
+          </View>
+
+          <PlayerActions
+            playing={running}
+            onPlay={() => PomoModule.play()}
+            onPause={() => PomoModule.pause()}
+            onStop={() => PomoModule.stop()}
+            onReset={() => PomoModule.reset()}
+          />
         </View>
-
-        <PlayerActions
-          playing={running}
-          onPlay={() => PomoModule.play()}
-          onPause={() => PomoModule.pause()}
-          onStop={() => PomoModule.stop()}
-          onReset={() => PomoModule.reset()}
-        />
-      </View>
+      )}
     </ScrollView>
   );
 };

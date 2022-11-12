@@ -28,6 +28,7 @@ module.exports = {
         'react/no-unstable-nested-components': ['warn', { allowAsProps: true }],
         'react/jsx-uses-react': 'off',
         'react/react-in-jsx-scope': 'off',
+        'import/default': 'off',
         'import/order': [
           'error',
           {

@@ -12,6 +12,10 @@
 # react-native-svg rules
 -keep public class com.horcrux.svg.** {*;}
 
+# react-native-reanimated rules
+-keep class com.swmansion.reanimated.** { *; }
+-keep class com.facebook.react.turbomodule.** { *; }
+
 # hermes rules
 -keep class com.facebook.hermes.unicode.** { *; }
 -keep class com.facebook.jni.** { *; }

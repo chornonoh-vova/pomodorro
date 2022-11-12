@@ -39,7 +39,8 @@ export const usePomoTimer = (
   );
 
   const percent = useMemo(
-    () => ((cycleDuration - second) / cycleDuration) * 100,
+    () =>
+      cycleDuration ? ((cycleDuration - second) / cycleDuration) * 100 : 100,
     [second, cycleDuration],
   );
 

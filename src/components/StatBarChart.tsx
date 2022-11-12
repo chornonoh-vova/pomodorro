@@ -1,6 +1,12 @@
 import { scaleBand, scaleLinear } from 'd3-scale';
-import { Fragment } from 'react';
-import { Svg, Rect, Text } from 'react-native-svg';
+import { Fragment, useEffect } from 'react';
+import Animated, {
+  Easing,
+  useAnimatedProps,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
+import { Svg, Rect, Text, RectProps } from 'react-native-svg';
 
 import { StatBarDataPoint } from '../types/stat';
 
@@ -19,6 +25,31 @@ type StatBarChartProps = {
   labelPadding: number;
 
   onBarSelect: (x: number, dataIndex: number) => void;
+};
+
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
+
+const AnimatedBar = ({
+  y,
+  height,
+  ...props
+}: RectProps & { y: number; height: number }) => {
+  const animatedVal = useSharedValue(0);
+
+  const animatedProps = useAnimatedProps(() => ({
+    height: height * animatedVal.value,
+    y: y + height * (1 - animatedVal.value),
+  }));
+
+  useEffect(() => {
+    animatedVal.value = withTiming(1, {
+      duration: 1000,
+      easing: Easing.out(Easing.exp),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [y, height]);
+
+  return <AnimatedRect animatedProps={animatedProps} {...props} />;
 };
 
 const StatBarChart = ({
@@ -53,7 +84,7 @@ const StatBarChart = ({
     <Svg width={width} height={height}>
       {data.map(({ date, value, label }, index) => (
         <Fragment key={index}>
-          <Rect
+          <AnimatedBar
             key={`rect-${index}`}
             x={getBarX(date)}
             y={y(value)}
