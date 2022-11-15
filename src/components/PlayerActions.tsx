@@ -34,8 +34,8 @@ const PlayerActions = ({
           },
           styles.sideButton,
         ]}
-        onPress={onReset}>
-        <RestartIcon color={theme.colors.onPrimary} width={48} height={48} />
+        onPress={onStop}>
+        <StopIcon color={theme.colors.onPrimary} width={48} height={48} />
       </Pressable>
 
       <Pressable
@@ -64,8 +64,8 @@ const PlayerActions = ({
           },
           styles.sideButton,
         ]}
-        onPress={onStop}>
-        <StopIcon color={theme.colors.onPrimary} width={48} height={48} />
+        onPress={onReset}>
+        <RestartIcon color={theme.colors.onPrimary} width={48} height={48} />
       </Pressable>
     </View>
   );

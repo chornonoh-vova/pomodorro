@@ -1,9 +1,9 @@
 package com.pomodorro.pomo
 
-import android.content.ComponentName
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
+import android.content.IntentFilter
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.pomodorro.isServiceRunning
@@ -12,75 +12,34 @@ class PomoModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "PomoModule"
 
-  // Stores bound service instance
-  private lateinit var service: PomoService
-  private var bound: Boolean = false
+  private val updateFilter = IntentFilter(PomoService.ACTION_UPDATE)
 
-  /**
-   * Defines callbacks for service binding, passed to bindService()
-   */
-  private val connection = object : ServiceConnection {
-    override fun onServiceConnected(className: ComponentName, binder: IBinder) {
-      // We've bound to PomoService, cast the IBinder and get PomoService instance
-      service = (binder as PomoService.PomoBinder).getService()
-      bound = true
+  private val updateReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+      if (intent == null) return
 
-      // observe changes in service state
-      service.setObserver(observer)
-      // update UI right after connection
-      service.notifyUpdate()
-    }
-
-    override fun onServiceDisconnected(arg0: ComponentName) {
-      bound = false
-    }
-  }
-
-  /**
-   * Defined observer for service tick changes, passed to service.setObserver
-   */
-  private val observer = object : PomoObserver {
-    // internal list of observers coming from RN side
-    private val observers = ArrayList<PomoObserver>()
-
-    /**
-     * Add observer to list of observers from RN
-     */
-    fun addObserver(observer: PomoObserver) {
-      observers.add(observer)
-    }
-
-    /**
-     * Remove one observer from list of RN observers
-     */
-    fun removeObserver(count: Int) {
-      var i = count
-
-      while (i > 0) {
-        if (observers.isNotEmpty()) {
-          observers.removeAt(observers.lastIndex)
-        }
-
-        i--
+      val data = Arguments.createMap().apply {
+        putBoolean("timerRunning", intent.getBooleanExtra(PomoService.EXTRA_RUNNING, false))
+        putString("currentState", intent.getStringExtra(PomoService.EXTRA_CURRENT_STATE))
+        putInt("currentSecond", intent.getIntExtra(PomoService.EXTRA_CURRENT_SECOND, 0))
+        putInt("currentCycle", intent.getIntExtra(PomoService.EXTRA_CURRENT_CYCLE, 1))
+        putInt(
+          "currentCycleDuration",
+          intent.getIntExtra(PomoService.EXTRA_CURRENT_CYCLE_DURATION, 0)
+        )
       }
-    }
 
-    override fun update(data: PomoData) {
-      observers.forEach {
-        // redirect update to each individual observer
-        it.update(data)
-      }
+      sendUpdateEvent(reactApplicationContext, data)
     }
-
   }
 
   /**
    * Sends JS event to UI
    */
-  private fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
+  private fun sendUpdateEvent(reactContext: ReactContext, params: WritableMap?) {
     reactContext
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-      .emit(eventName, params)
+      .emit("update", params)
   }
 
   /**
@@ -88,11 +47,7 @@ class PomoModule(reactContext: ReactApplicationContext) :
    */
   @ReactMethod
   fun addListener(eventName: String) {
-    observer.addObserver(object : PomoObserver {
-      override fun update(data: PomoData) {
-        sendEvent(reactApplicationContext, eventName, data.toMap())
-      }
-    })
+    reactApplicationContext.registerReceiver(updateReceiver, updateFilter)
   }
 
   /**
@@ -100,7 +55,7 @@ class PomoModule(reactContext: ReactApplicationContext) :
    */
   @ReactMethod
   fun removeListeners(count: Int) {
-    observer.removeObserver(count)
+    reactApplicationContext.unregisterReceiver(updateReceiver)
   }
 
   /**
@@ -118,104 +73,81 @@ class PomoModule(reactContext: ReactApplicationContext) :
   }
 
   /**
-   * Exposes function to bind to PomoService
-   */
-  @ReactMethod
-  fun bind(promise: Promise) {
-    if (!isPomoServiceRunning()) return
-
-    val context = reactApplicationContext
-
-    val intent = Intent(context, PomoService::class.java)
-
-    promise.resolve(context.bindService(intent, connection, 0))
-  }
-
-  /**
-   * Exposes function to unbind from PomoService
-   */
-  @ReactMethod
-  fun unbind(promise: Promise) {
-    if (!isPomoServiceRunning()) return
-
-    val context = reactApplicationContext
-
-    context.unbindService(connection)
-
-    promise.resolve(null)
-  }
-
-  /**
    * Exposes function to start timer.
-   *
-   * If service is not running - it will be created.
-   *
-   * If service already running - just calls play of bound service instance
    */
   @ReactMethod
   fun play(promise: Promise) {
     val context = reactApplicationContext
 
-    val intent = Intent(context, PomoService::class.java)
-
-    if (!isPomoServiceRunning()) {
-      context.startForegroundService(intent)
-    } else if (bound) {
-      service.play()
-    } else {
-      return
+    val intent = Intent(context, PomoService::class.java).apply {
+      action = PomoService.ACTION_PLAY
     }
 
-    context.bindService(intent, connection, 0)
+    context.startForegroundService(intent)
 
     promise.resolve(null)
   }
 
   /**
-   * Exposes function to pause timer. Has no effect when service is not bound.
+   * Exposes function to pause timer.
    */
   @ReactMethod
   fun pause(promise: Promise) {
-    if (!isPomoServiceRunning() || !bound) return
+    if (!isPomoServiceRunning()) {
+      promise.resolve(false)
+      return
+    }
 
-    service.pause()
+    val context = reactApplicationContext
 
-    promise.resolve(null)
+    val intent = Intent(context, PomoService::class.java).apply {
+      action = PomoService.ACTION_PAUSE
+    }
+
+    context.startService(intent)
+
+    promise.resolve(true)
   }
 
   /**
-   * Exposes function to stop timer. Has no effect when service is not bound.
+   * Exposes function to stop timer.
    */
   @ReactMethod
   fun stop(promise: Promise) {
-    if (!isPomoServiceRunning() || !bound) return
+    if (!isPomoServiceRunning()) {
+      promise.resolve(false)
+      return
+    }
 
-    service.stop()
+    val context = reactApplicationContext
 
-    promise.resolve(null)
+    val intent = Intent(context, PomoService::class.java).apply {
+      action = PomoService.ACTION_STOP
+    }
+
+    context.startService(intent)
+
+    promise.resolve(true)
   }
 
   /**
    * Exposes function to reset timer.
-   *
-   * If service not running - noop
-   *
-   * If service is running - PomoService will be stopped and connection will be unbound.
    */
   @ReactMethod
   fun reset(promise: Promise) {
-    if (!isPomoServiceRunning() || !bound) return
+    if (!isPomoServiceRunning()) {
+      promise.resolve(false)
+      return
+    }
 
     val context = reactApplicationContext
 
-    val intent = Intent(context, PomoService::class.java)
+    val intent = Intent(context, PomoService::class.java).apply {
+      action = PomoService.ACTION_RESET
+    }
 
-    context.startService(intent.also {
-      it.action = PomoService.ACTION_STOP_SERVICE
-    })
+    context.startService(intent)
 
-    context.unbindService(connection)
-
-    promise.resolve(null)
+    promise.resolve(true)
   }
 }

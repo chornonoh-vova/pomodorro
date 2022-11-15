@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
 import { PomoState } from '../types/pomo';
@@ -14,45 +15,39 @@ import { Orientation, useOrientation } from '../hooks/useOrientation';
 
 type PomoScreenProps = BottomTabScreenProps<TabParamList, 'Pomo'>;
 
-const PomoScreen = ({ navigation }: PomoScreenProps) => {
+const PomoScreen = (_props: PomoScreenProps) => {
   const theme = useTheme();
   const orientation = useOrientation();
 
-  const [cycleDuration, setCycleDuration] = useState(0);
   const [cycleCount, setCycleCount] = useState(4);
 
-  const { running, time, percent, cycle, state } = usePomoTimer(
+  const {
+    running,
+    time,
+    percent,
+    cycle,
     cycleDuration,
+    state,
     setCycleDuration,
-  );
+  } = usePomoTimer();
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      Promise.all([
-        SettingsModule.getFocusDuration(),
-        SettingsModule.getShortBreakDuration(),
-        SettingsModule.getLongBreakDuration(),
-      ]).then(([focusDuration, shortBreakDuration, longBreakDuration]) => {
-        switch (state) {
-          case PomoState.FOCUS:
-            setCycleDuration(focusDuration);
-            break;
-          case PomoState.SHORT_BREAK:
-            setCycleDuration(shortBreakDuration);
-            break;
-          case PomoState.LONG_BREAK:
-            setCycleDuration(longBreakDuration);
-            break;
-        }
-      });
+  useFocusEffect(() => {
+    SettingsModule.getAll().then((settings) => {
+      switch (state) {
+        case PomoState.FOCUS:
+          setCycleDuration(settings.focusDuration);
+          break;
+        case PomoState.SHORT_BREAK:
+          setCycleDuration(settings.shortBreakDuration);
+          break;
+        case PomoState.LONG_BREAK:
+          setCycleDuration(settings.longBreakDuration);
+          break;
+      }
 
-      SettingsModule.getCycleCount().then((cycleCountVal) =>
-        setCycleCount(cycleCountVal),
-      );
+      setCycleCount(settings.cycleCount);
     });
-
-    return unsubscribe;
-  }, [navigation, state]);
+  });
 
   return (
     <ScrollView>

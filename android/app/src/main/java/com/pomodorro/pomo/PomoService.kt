@@ -4,7 +4,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.os.Binder
+import android.os.IBinder
 import androidx.core.app.NotificationManagerCompat
 import com.pomodorro.AppDatabase
 import com.pomodorro.BuildConfig
@@ -22,8 +22,6 @@ import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
 class PomoService : Service() {
-  private var observer: PomoObserver? = null
-
   private val settings = Settings()
 
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -37,31 +35,21 @@ class PomoService : Service() {
 
   private val timer = FlowTimer(scope, 1.seconds)
 
-  private val binder = PomoBinder()
-
-  inner class PomoBinder : Binder() {
-    fun getService() = this@PomoService
-  }
-
-  override fun onBind(intent: Intent?) = binder
-
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     if (intent?.action != null) {
       when (intent.action) {
-        // notification actions
+        ACTION_PLAY -> {
+          startForeground(pomoActiveId, buildPomoActive())
+          play()
+        }
         ACTION_PAUSE -> {
           pause()
         }
-        ACTION_PLAY -> {
-          play()
+        ACTION_RESET -> {
+          reset()
         }
         ACTION_STOP -> {
           stop()
-        }
-
-        // stop service action on reset
-        ACTION_STOP_SERVICE -> {
-          reset()
 
           // remove notifications
           stopForeground(STOP_FOREGROUND_REMOVE)
@@ -71,28 +59,27 @@ class PomoService : Service() {
           stopSelf()
         }
       }
-    } else {
-      startForeground(pomoActiveId, buildPomoActive())
-      play()
     }
 
     return START_STICKY
   }
 
-  fun setObserver(pomoObserver: PomoObserver) {
-    observer = pomoObserver
+  override fun onBind(intent: Intent?): IBinder? {
+    return null
   }
 
-  fun notifyUpdate() {
-    observer?.update(
-      PomoData(
-        timer.isRunning(),
-        currentState,
-        timer.currentSecond,
-        getCurrentCycleDuration(),
-        currentCycle
-      )
-    )
+  private fun notifyUpdate() {
+    val intent = Intent().apply {
+      action = ACTION_UPDATE
+
+      putExtra(EXTRA_RUNNING, timer.isRunning())
+      putExtra(EXTRA_CURRENT_SECOND, timer.currentSecond)
+      putExtra(EXTRA_CURRENT_STATE, currentState.key)
+      putExtra(EXTRA_CURRENT_CYCLE, currentCycle)
+      putExtra(EXTRA_CURRENT_CYCLE_DURATION, getCurrentCycleDuration())
+    }
+
+    sendBroadcast(intent)
   }
 
   private var currentStatSecond = 0
@@ -109,14 +96,14 @@ class PomoService : Service() {
     }
   }
 
-  private var currentState = PomoState.FOCUS
+  private var currentState: PomoState = PomoState.Focus
   private var currentCycle = 1
 
   private fun getCurrentCycleDuration(): Int {
     return when (currentState) {
-      PomoState.FOCUS -> settings.focusDuration
-      PomoState.SHORT_BREAK -> settings.shortBreakDuration
-      PomoState.LONG_BREAK -> settings.longBreakDuration
+      PomoState.Focus -> settings.focusDuration
+      PomoState.ShortBreak -> settings.shortBreakDuration
+      PomoState.LongBreak -> settings.longBreakDuration
     }
   }
 
@@ -219,21 +206,21 @@ class PomoService : Service() {
    */
   private fun transitionToNextState() {
     when (currentState) {
-      PomoState.FOCUS -> {
+      PomoState.Focus -> {
         currentState = if (currentCycle < settings.cycleCount) {
-          PomoState.SHORT_BREAK
+          PomoState.ShortBreak
         } else {
-          PomoState.LONG_BREAK
+          PomoState.LongBreak
         }
 
         recordCurrentStat()
       }
-      PomoState.SHORT_BREAK -> {
-        currentState = PomoState.FOCUS
+      PomoState.ShortBreak -> {
+        currentState = PomoState.Focus
         currentCycle += 1
       }
-      PomoState.LONG_BREAK -> {
-        currentState = PomoState.FOCUS
+      PomoState.LongBreak -> {
+        currentState = PomoState.Focus
         currentCycle = 1
       }
     }
@@ -244,10 +231,10 @@ class PomoService : Service() {
   /**
    * Create timer and schedule every second update of state
    */
-  fun play() {
+  private fun play() {
     timer.play { currentSecond ->
       if (currentSecond < getCurrentCycleDuration()) {
-        if (currentState == PomoState.FOCUS) {
+        if (currentState == PomoState.Focus) {
           currentStatSecond += 1
         }
 
@@ -269,7 +256,7 @@ class PomoService : Service() {
   /**
    * Cancel running timer
    */
-  fun pause() {
+  private fun pause() {
     timer.pause()
 
     recordCurrentStat()
@@ -279,7 +266,7 @@ class PomoService : Service() {
   /**
    * Cancel running timer but reset current cycle second to 0
    */
-  fun stop() {
+  private fun reset() {
     timer.stop()
 
     recordCurrentStat()
@@ -289,11 +276,11 @@ class PomoService : Service() {
   /**
    * Reset timer to initial state
    */
-  private fun reset() {
+  private fun stop() {
     timer.stop()
 
     // reset everything to start values
-    currentState = PomoState.FOCUS
+    currentState = PomoState.Focus
     currentCycle = 1
 
     recordCurrentStat()
@@ -301,10 +288,17 @@ class PomoService : Service() {
   }
 
   companion object {
-    private const val ACTION_STOP = "${BuildConfig.APPLICATION_ID}.pomo.stop"
-    private const val ACTION_PLAY = "${BuildConfig.APPLICATION_ID}.pomo.play"
-    private const val ACTION_PAUSE = "${BuildConfig.APPLICATION_ID}.pomo.pause"
+    const val ACTION_PLAY = "${BuildConfig.APPLICATION_ID}.pomo.play"
+    const val ACTION_PAUSE = "${BuildConfig.APPLICATION_ID}.pomo.pause"
+    const val ACTION_STOP = "${BuildConfig.APPLICATION_ID}.pomo.stop"
+    const val ACTION_RESET= "${BuildConfig.APPLICATION_ID}.pomo.reset"
 
-    const val ACTION_STOP_SERVICE = "${BuildConfig.APPLICATION_ID}.pomo.stop_service"
+    const val ACTION_UPDATE = "${BuildConfig.APPLICATION_ID}.pomo.update"
+
+    const val EXTRA_RUNNING = "${BuildConfig.APPLICATION_ID}.pomo.update.extras.running"
+    const val EXTRA_CURRENT_STATE = "${BuildConfig.APPLICATION_ID}.pomo.update.extras.current_state"
+    const val EXTRA_CURRENT_SECOND = "${BuildConfig.APPLICATION_ID}.pomo.update.extras.current_second"
+    const val EXTRA_CURRENT_CYCLE = "${BuildConfig.APPLICATION_ID}.pomo.update.extras.current_cycle"
+    const val EXTRA_CURRENT_CYCLE_DURATION = "${BuildConfig.APPLICATION_ID}.pomo.update.extras.current_cycle_duration"
   }
 }

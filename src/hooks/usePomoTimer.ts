@@ -24,12 +24,10 @@ type UpdateEvent = {
   timerRunning: boolean;
 };
 
-export const usePomoTimer = (
-  cycleDuration: number,
-  setCycleDuration: (val: number) => void,
-) => {
+export const usePomoTimer = () => {
   const [running, setRunning] = useState(false);
   const [cycle, setCycle] = useState(1);
+  const [cycleDuration, setCycleDuration] = useState(0);
   const [second, setSecond] = useState(0);
   const [state, setState] = useState<PomoState>(PomoState.FOCUS);
 
@@ -43,30 +41,6 @@ export const usePomoTimer = (
       cycleDuration ? ((cycleDuration - second) / cycleDuration) * 100 : 100,
     [second, cycleDuration],
   );
-
-  useEffect(() => {
-    const setup = () => PomoModule.bind();
-
-    const teardown = () => PomoModule.unbind();
-
-    setup()
-      .then((result) => {
-        console.info('Bind setup result:', result);
-      })
-      .catch((reason) => {
-        console.error('Bind setup error:', reason);
-      });
-
-    return () => {
-      teardown()
-        .then((result) => {
-          console.info('Bind teardown result:', result);
-        })
-        .catch((reason) => {
-          console.error('Bind teardown error:', reason);
-        });
-    };
-  }, []);
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(PomoModule);
@@ -83,13 +57,16 @@ export const usePomoTimer = (
     );
 
     return () => eventListener.remove();
-  }, [setCycleDuration]);
+  }, []);
 
   return {
     running,
     time,
     percent,
     cycle,
+    cycleDuration,
     state,
+
+    setCycleDuration,
   };
 };
