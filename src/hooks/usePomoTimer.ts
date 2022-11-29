@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { NativeEventEmitter } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { PomoState } from '../types/pomo';
 import PomoModule from '../native/PomoModule';
+import SettingsModule from '../native/SettingsModule';
 
-const getTime = (second: number) => {
+const formatTime = (second: number) => {
   const min = Math.floor(second / 60)
     .toFixed(0)
     .padStart(2, '0');
@@ -27,12 +29,13 @@ type UpdateEvent = {
 export const usePomoTimer = () => {
   const [running, setRunning] = useState(false);
   const [cycle, setCycle] = useState(1);
+  const [cycleCount, setCycleCount] = useState(4);
   const [cycleDuration, setCycleDuration] = useState(0);
   const [second, setSecond] = useState(0);
   const [state, setState] = useState<PomoState>(PomoState.FOCUS);
 
   const time = useMemo(
-    () => getTime(cycleDuration - second),
+    () => formatTime(cycleDuration - second),
     [second, cycleDuration],
   );
 
@@ -42,7 +45,23 @@ export const usePomoTimer = () => {
     [second, cycleDuration],
   );
 
-  useEffect(() => {
+  const focusEffectCb = useCallback(() => {
+    SettingsModule.getAll().then((settings) => {
+      switch (state) {
+        case PomoState.FOCUS:
+          setCycleDuration(settings.focusDuration);
+          break;
+        case PomoState.SHORT_BREAK:
+          setCycleDuration(settings.shortBreakDuration);
+          break;
+        case PomoState.LONG_BREAK:
+          setCycleDuration(settings.longBreakDuration);
+          break;
+      }
+
+      setCycleCount(settings.cycleCount);
+    });
+
     const eventEmitter = new NativeEventEmitter(PomoModule);
 
     const eventListener = eventEmitter.addListener(
@@ -56,17 +75,20 @@ export const usePomoTimer = () => {
       },
     );
 
-    return () => eventListener.remove();
-  }, []);
+    return () => {
+      eventListener.remove();
+    };
+  }, [state]);
+
+  useFocusEffect(focusEffectCb);
 
   return {
     running,
     time,
     percent,
     cycle,
+    cycleCount,
     cycleDuration,
     state,
-
-    setCycleDuration,
   };
 };

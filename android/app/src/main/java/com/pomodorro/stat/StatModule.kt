@@ -25,11 +25,15 @@ class StatModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  private fun everyDayData(start: LocalDate, end: LocalDate, data: List<StatEntry>): List<StatEntry> {
+  private fun everyDayData(
+    start: LocalDate,
+    end: LocalDate,
+    data: List<StatEntry>
+  ): List<StatEntry> {
     val mutableData = data.toMutableList()
     val result = mutableListOf<StatEntry>()
 
-    for (day in 0 .. start.daysUntil(end)) {
+    for (day in 0..start.daysUntil(end)) {
       val date = start.plus(day, DateTimeUnit.DAY)
 
       val found = mutableData.find {
@@ -52,7 +56,7 @@ class StatModule(reactContext: ReactApplicationContext) :
     val mutableData = data.toMutableList()
     val result = mutableListOf<StatEntry>()
 
-    for (month in 0 .. 12) {
+    for (month in 0..12) {
       val date = start.plus(month, DateTimeUnit.MONTH)
 
       val foundInMonth = mutableData.filter {

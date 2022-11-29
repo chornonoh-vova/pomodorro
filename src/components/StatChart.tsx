@@ -21,7 +21,7 @@ const barRadius = 4;
 
 const labelPadding = 6;
 
-const tooltipWidth = 110;
+const tooltipWidth = 112;
 const tooltipLineWidth = 2;
 const tooltipHeight = 80;
 

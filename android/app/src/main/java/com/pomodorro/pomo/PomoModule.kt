@@ -1,16 +1,18 @@
 package com.pomodorro.pomo
 
+import android.app.ActivityManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.pomodorro.isServiceRunning
 
 class PomoModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   override fun getName() = "PomoModule"
+
+  private var lastUpdate: Intent? = null
 
   private val updateFilter = IntentFilter(PomoService.ACTION_UPDATE)
 
@@ -18,51 +20,52 @@ class PomoModule(reactContext: ReactApplicationContext) :
     override fun onReceive(context: Context?, intent: Intent?) {
       if (intent == null) return
 
-      val data = Arguments.createMap().apply {
-        putBoolean("timerRunning", intent.getBooleanExtra(PomoService.EXTRA_RUNNING, false))
-        putString("currentState", intent.getStringExtra(PomoService.EXTRA_CURRENT_STATE))
-        putInt("currentSecond", intent.getIntExtra(PomoService.EXTRA_CURRENT_SECOND, 0))
-        putInt("currentCycle", intent.getIntExtra(PomoService.EXTRA_CURRENT_CYCLE, 1))
-        putInt(
-          "currentCycleDuration",
-          intent.getIntExtra(PomoService.EXTRA_CURRENT_CYCLE_DURATION, 0)
-        )
-      }
-
-      sendUpdateEvent(reactApplicationContext, data)
+      lastUpdate = intent
+      sendUpdate(intent)
     }
   }
 
-  /**
-   * Sends JS event to UI
-   */
-  private fun sendUpdateEvent(reactContext: ReactContext, params: WritableMap?) {
-    reactContext
-      .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-      .emit("update", params)
+  private fun sendUpdate(intent: Intent) {
+    val data = Arguments.createMap().apply {
+      putBoolean("timerRunning", intent.getBooleanExtra(PomoService.EXTRA_RUNNING, false))
+      putString("currentState", intent.getStringExtra(PomoService.EXTRA_CURRENT_STATE))
+      putInt("currentSecond", intent.getIntExtra(PomoService.EXTRA_CURRENT_SECOND, 0))
+      putInt("currentCycle", intent.getIntExtra(PomoService.EXTRA_CURRENT_CYCLE, 1))
+      putInt(
+        "currentCycleDuration",
+        intent.getIntExtra(PomoService.EXTRA_CURRENT_CYCLE_DURATION, 0)
+      )
+    }
+
+    reactApplicationContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+      .emit("update", data)
   }
 
   /**
    * Exposes function to add event listener to RN side
    */
+  @Suppress("unused")
   @ReactMethod
   fun addListener(eventName: String) {
     reactApplicationContext.registerReceiver(updateReceiver, updateFilter)
+
+    lastUpdate?.let { sendUpdate(it) }
   }
 
   /**
    * Exposes function to remove event listener to RN side
    */
+  @Suppress("unused")
   @ReactMethod
   fun removeListeners(count: Int) {
     reactApplicationContext.unregisterReceiver(updateReceiver)
   }
 
-  /**
-   * Find out if service is running or not
-   */
+  @Suppress("deprecation")
   private fun isPomoServiceRunning() =
-    reactApplicationContext.isServiceRunning(PomoService::class.java)
+    (reactApplicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+      .getRunningServices(Integer.MAX_VALUE)
+      .any { it.service.className == PomoService::class.java.name }
 
   /**
    * Exposes function to get status if the service
@@ -83,7 +86,7 @@ class PomoModule(reactContext: ReactApplicationContext) :
       action = PomoService.ACTION_PLAY
     }
 
-    context.startForegroundService(intent)
+    context.startService(intent)
 
     promise.resolve(null)
   }

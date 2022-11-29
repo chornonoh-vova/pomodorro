@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, ScrollView, Pressable, Text, View } from 'react-native';
 import { useForm } from 'react-hook-form';
+import { useFocusEffect } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
 import type { TabParamList } from '../types/navigation';
@@ -19,7 +20,7 @@ type SettingsFormData = {
   cycleCount: number;
 };
 
-const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
+const SettingsScreen = (_props: SettingsScreenProps) => {
   const theme = useTheme();
 
   const [saving, setSaving] = useState(false);
@@ -34,19 +35,15 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
     },
   });
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      SettingsModule.getAll().then((settings) => {
-        setValue('autoStart', settings.autoStart);
-        setValue('focusDuration', settings.focusDuration / 60);
-        setValue('shortBreakDuration', settings.shortBreakDuration / 60);
-        setValue('longBreakDuration', settings.longBreakDuration / 60);
-        setValue('cycleCount', settings.cycleCount);
-      });
+  const focusEffectCb = useCallback(() => {
+    SettingsModule.getAll().then((settings) => {
+      setValue('autoStart', settings.autoStart);
+      setValue('focusDuration', settings.focusDuration / 60);
+      setValue('shortBreakDuration', settings.shortBreakDuration / 60);
+      setValue('longBreakDuration', settings.longBreakDuration / 60);
+      setValue('cycleCount', settings.cycleCount);
     });
-
-    return unsubscribe;
-  }, [navigation, setValue]);
+  }, [setValue]);
 
   const onSave = useCallback((data: SettingsFormData) => {
     setSaving(true);
@@ -59,6 +56,8 @@ const SettingsScreen = ({ navigation }: SettingsScreenProps) => {
       cycleCount: data.cycleCount,
     }).then(() => setSaving(false));
   }, []);
+
+  useFocusEffect(focusEffectCb);
 
   return (
     <ScrollView>

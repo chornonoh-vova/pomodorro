@@ -8,9 +8,11 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
-class FlowTimer(private val scope: CoroutineScope, private val period: Duration) {
+class Timer(private val scope: CoroutineScope) {
+  private val period = 1.seconds
+
   private fun tickerFlow(): Flow<Int> = flow {
     // immediately emit current second right after starting
     emit(currentSecond)
@@ -29,22 +31,16 @@ class FlowTimer(private val scope: CoroutineScope, private val period: Duration)
   fun isRunning() = this::job.isInitialized && !job.isCancelled
 
   fun play(collector: FlowCollector<Int>) {
-    if (isRunning()) return
-
     job = scope.launch {
       tickerFlow().cancellable().collect(collector)
     }
   }
 
   fun pause() {
-    if (!isRunning()) return
-
     job.cancel()
   }
 
   fun stop() {
-    if (!isRunning()) return
-
     job.cancel()
 
     currentSecond = 0

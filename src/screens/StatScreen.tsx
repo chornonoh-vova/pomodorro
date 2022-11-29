@@ -5,8 +5,9 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { format, parse } from 'date-fns';
+import { useFocusEffect } from '@react-navigation/native';
 
 import type { TabParamList } from '../types/navigation';
 import {
@@ -66,7 +67,7 @@ const StatScreen = (_props: StatScreenProps) => {
 
   const { width } = useWindowDimensions();
 
-  useEffect(() => {
+  const focusEffectCb = useCallback(() => {
     setIsLoading(true);
 
     switch (selectedPeriod) {
@@ -96,6 +97,8 @@ const StatScreen = (_props: StatScreenProps) => {
         break;
     }
   }, [selectedPeriod]);
+
+  useFocusEffect(focusEffectCb);
 
   return (
     <ScrollView>

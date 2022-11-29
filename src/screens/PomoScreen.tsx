@@ -1,13 +1,9 @@
-import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-import { PomoState } from '../types/pomo';
 import PlayerActions from '../components/PlayerActions';
 import Countdown from '../components/Countdown';
 import PomoModule from '../native/PomoModule';
-import SettingsModule from '../native/SettingsModule';
 import type { TabParamList } from '../types/navigation';
 import { useTheme } from '../hooks/useTheme';
 import { usePomoTimer } from '../hooks/usePomoTimer';
@@ -19,35 +15,8 @@ const PomoScreen = (_props: PomoScreenProps) => {
   const theme = useTheme();
   const orientation = useOrientation();
 
-  const [cycleCount, setCycleCount] = useState(4);
-
-  const {
-    running,
-    time,
-    percent,
-    cycle,
-    cycleDuration,
-    state,
-    setCycleDuration,
-  } = usePomoTimer();
-
-  useFocusEffect(() => {
-    SettingsModule.getAll().then((settings) => {
-      switch (state) {
-        case PomoState.FOCUS:
-          setCycleDuration(settings.focusDuration);
-          break;
-        case PomoState.SHORT_BREAK:
-          setCycleDuration(settings.shortBreakDuration);
-          break;
-        case PomoState.LONG_BREAK:
-          setCycleDuration(settings.longBreakDuration);
-          break;
-      }
-
-      setCycleCount(settings.cycleCount);
-    });
-  });
+  const { running, time, percent, cycle, cycleCount, cycleDuration, state } =
+    usePomoTimer();
 
   return (
     <ScrollView>
