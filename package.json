@@ -1,6 +1,6 @@
 {
   "name": "pomodorro",
-  "version": "1.0.1-beta.3",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "android": "react-native run-android --active-arch-only",
